@@ -12,3 +12,9 @@ elif '<queries>' not in s:
     s = s.replace('</manifest>', '    <queries>\n        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https"/></intent>\n    </queries>\n</manifest>')
 p.write_text(s, encoding='utf-8')
 print(s)
+
+# אייקון האפליקציה
+import shutil
+for folder, n in {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}.items():
+    shutil.copy(f'assets/launcher/{n}.png', f'android/app/src/main/res/mipmap-{folder}/ic_launcher.png')
+print('icons copied')
