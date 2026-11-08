@@ -251,6 +251,9 @@ class _DetailScreenState extends State<DetailScreen> {
                   if (_me != null)
                     CircleMarker(point: _me!, radius: 8, color: const Color(0xFF1F8FFF), borderColor: Colors.white, borderStrokeWidth: 3),
                 ]),
+                const RichAttributionWidget(
+                  attributions: [TextSourceAttribution('OpenStreetMap contributors')],
+                ),
               ],
             ),
             PositionedDirectional(
