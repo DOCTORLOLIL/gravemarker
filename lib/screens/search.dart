@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../data.dart';
 import '../l10n/app_localizations.dart';
+import 'contacts.dart';
 import 'detail.dart';
 import 'welcome.dart';
 
@@ -81,11 +83,89 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  Widget _intro(BuildContext context, AppLocalizations t) {
+    final cs = Theme.of(context).colorScheme;
+    final items = [
+      (Icons.explore_outlined, t.featNav, t.featNavSub),
+      (Icons.event_outlined, t.featYz, t.featYzSub),
+      (Icons.menu_book_outlined, t.featTef, t.featTefSub),
+      (Icons.share_outlined, t.featShare, t.featShareSub),
+    ];
+    return ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: [
+      GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 1.35,
+        children: [
+          for (final (icon, title, sub) in items)
+            Card(
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  Icon(icon, color: cs.primary),
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(sub, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
+                ]),
+              ),
+            ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      Center(
+        child: TextButton(
+          onPressed: () => launchUrl(Uri.parse('https://bulu.ltd'), mode: LaunchMode.externalApplication),
+          child: Text(t.builtBy, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _drawer(BuildContext context, AppLocalizations t) {
+    void go(Widget w) {
+      Navigator.of(context).pop();
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
+    }
+
+    void web(String url) {
+      Navigator.of(context).pop();
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
+
+    return Drawer(
+      child: SafeArea(
+        child: ListView(children: [
+          ListTile(
+            leading: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(width: 36, height: 36, color: Theme.of(context).colorScheme.primary,
+                    child: const Icon(Icons.place, color: Colors.white))),
+            title: Text(t.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(t.tagline),
+          ),
+          const Divider(),
+          if (_cem != null)
+            ListTile(leading: const Icon(Icons.contacts_outlined), title: Text(t.contacts), onTap: () => go(ContactsScreen(cemetery: _cem!))),
+          ListTile(leading: const Icon(Icons.auto_stories_outlined), title: Text(t.blessingLink), onTap: () => go(const WelcomeScreen(popOnly: true))),
+          ListTile(leading: const Icon(Icons.menu_book_outlined), title: Text(t.tefilon), onTap: () => web('$webBase/tefilon/')),
+          ListTile(leading: const Icon(Icons.language), title: Text(t.website), onTap: () => web(webBase)),
+          const Divider(),
+          ListTile(leading: const Icon(Icons.edit_location_alt_outlined), title: Text(t.editors), onTap: () => web('$webBase/marker/')),
+          ListTile(leading: const Icon(Icons.info_outline), title: Text(t.builtBy), onTap: () => web('https://bulu.ltd')),
+        ]),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
+      drawer: _drawer(context, t),
       appBar: AppBar(
         title: Text(t.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
@@ -144,46 +224,39 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              itemCount: (_res?.length ?? 0) + 1,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (c, i) {
-                if (i == (_res?.length ?? 0)) {
-                  return TextButton(
-                    onPressed: () => Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => const WelcomeScreen(popOnly: true))),
-                    child: Text(t.blessingLink, style: TextStyle(color: cs.onSurfaceVariant)),
-                  );
-                }
-                final d = _res![i];
-                return Card(
-                  margin: EdgeInsets.zero,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(14),
-                    onTap: () => Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (_) => DetailScreen(deceased: d, cemetery: _cem!))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(d.fullName + ((d.altName ?? '').isNotEmpty ? ' (${d.altName})' : ''),
-                            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 3),
-                        Text(subLine(t, d), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14)),
-                        const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                              color: cs.primaryContainer, borderRadius: BorderRadius.circular(8)),
-                          child: Text(locLine(t, d),
-                              style: TextStyle(color: cs.onPrimaryContainer, fontSize: 13)),
+            child: _res == null
+                ? _intro(context, t)
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    itemCount: _res!.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (c, i) {
+                      final d = _res![i];
+                      return Card(
+                        margin: EdgeInsets.zero,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () => Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (_) => DetailScreen(deceased: d, cemetery: _cem!))),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(d.fullName + ((d.altName ?? '').isNotEmpty ? ' (${d.altName})' : ''),
+                                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 3),
+                              Text(subLine(t, d), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14)),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(color: cs.primaryContainer, borderRadius: BorderRadius.circular(8)),
+                                child: Text(locLine(t, d), style: TextStyle(color: cs.onPrimaryContainer, fontSize: 13)),
+                              ),
+                            ]),
+                          ),
                         ),
-                      ]),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ]),
       ),
