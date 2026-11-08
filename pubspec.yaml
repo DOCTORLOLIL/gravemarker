@@ -1,0 +1,29 @@
+name: gravemarker
+description: Grave Marker – איתור קברים וניווט עד הקבר
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  supabase_flutter: ^2.5.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  geolocator: ^13.0.1
+  flutter_compass: ^0.8.0
+  share_plus: ^10.0.0
+  url_launcher: ^6.3.0
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
