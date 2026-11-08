@@ -207,8 +207,8 @@ class _DetailScreenState extends State<DetailScreen> {
               options: MapOptions(initialCenter: cem.center ?? const LatLng(31.3152, 34.6103), initialZoom: 17, maxZoom: 21),
               children: [
                 TileLayer(
-                  urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                  maxNativeZoom: 18,
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  maxNativeZoom: 19,
                   maxZoom: 21,
                   userAgentPackageName: 'ltd.bulu.gravemarker',
                 ),
