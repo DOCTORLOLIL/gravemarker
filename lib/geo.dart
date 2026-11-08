@@ -6,7 +6,7 @@ const _dist = Distance();
 double meters(LatLng a, LatLng b) => _dist.as(LengthUnit.Meter, a, b);
 
 double bearing(LatLng a, LatLng b) {
-  final r = math.pi / 180;
+  const r = math.pi / 180;
   final y = math.sin((b.longitude - a.longitude) * r) * math.cos(b.latitude * r);
   final x = math.cos(a.latitude * r) * math.sin(b.latitude * r) -
       math.sin(a.latitude * r) * math.cos(b.latitude * r) * math.cos((b.longitude - a.longitude) * r);

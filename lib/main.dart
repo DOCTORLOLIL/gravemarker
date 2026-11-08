@@ -10,7 +10,7 @@ import 'screens/welcome.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseKey);
   final prefs = await SharedPreferences.getInstance();
   final blessed = prefs.getInt('blessed') ?? 0;
   final showWelcome = DateTime.now().millisecondsSinceEpoch - blessed > const Duration(days: 30).inMilliseconds;
