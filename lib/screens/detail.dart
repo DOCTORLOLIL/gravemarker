@@ -188,6 +188,11 @@ class _DetailScreenState extends State<DetailScreen> {
     launchUrl(Uri.parse('$webBase/tefilon/?$q'), mode: LaunchMode.inAppBrowserView);
   }
 
+  void _ashkava() {
+    final q = Uri(queryParameters: {'n': d.firstName ?? '', 'p': d.father ?? d.mother ?? ''}).query;
+    launchUrl(Uri.parse('$webBase/ashkava/?$q'), mode: LaunchMode.inAppBrowserView);
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -349,7 +354,11 @@ class _DetailScreenState extends State<DetailScreen> {
                     Expanded(child: FilledButton.tonal(onPressed: _share, child: Text(t.share))),
                   ]),
                   const SizedBox(height: 8),
-                  FilledButton.tonal(onPressed: _tefilon, child: Text(t.tefilon)),
+                  Row(children: [
+                    Expanded(child: FilledButton.tonal(onPressed: _tefilon, child: Text(t.tefilon))),
+                    const SizedBox(width: 8),
+                    Expanded(child: FilledButton.tonal(onPressed: _ashkava, child: Text(t.ashkava))),
+                  ]),
                 ]),
               ),
             ),

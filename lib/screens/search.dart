@@ -151,6 +151,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ListTile(leading: const Icon(Icons.contacts_outlined), title: Text(t.contacts), onTap: () => go(ContactsScreen(cemetery: _cem!))),
           ListTile(leading: const Icon(Icons.auto_stories_outlined), title: Text(t.blessingLink), onTap: () => go(const WelcomeScreen(popOnly: true))),
           ListTile(leading: const Icon(Icons.menu_book_outlined), title: Text(t.tefilon), onTap: () => web('$webBase/tefilon/')),
+          ListTile(leading: const Icon(Icons.local_florist_outlined), title: Text(t.ashkava), onTap: () => web('$webBase/ashkava/')),
           ListTile(leading: const Icon(Icons.language), title: Text(t.website), onTap: () => web(webBase)),
           const Divider(),
           ListTile(leading: const Icon(Icons.edit_location_alt_outlined), title: Text(t.editors), onTap: () => web('$webBase/marker/')),
