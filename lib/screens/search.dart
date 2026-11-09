@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../offline.dart';
 import '../lang.dart';
 import '../update.dart';
+import '../stats.dart';
 import 'contacts.dart';
 import 'detail.dart';
 import 'welcome.dart';
@@ -115,6 +116,9 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) pingInstall(Localizations.localeOf(context).languageCode);
+    });
     checkUpdate().then((u) {
       if (u != null && mounted) setState(() => _update = u);
     });
