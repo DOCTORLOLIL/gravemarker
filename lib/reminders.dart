@@ -90,14 +90,14 @@ class Reminders {
         final heb = HebCal.format(y.heb);
         final eve = y.date.subtract(const Duration(days: 1));
         final week = y.date.subtract(const Duration(days: 7));
-        for (final (when, title, body) in [
+        for (final (at, title, body) in [
           (tz.TZDateTime(tz.local, week.year, week.month, week.day, 10), 'בעוד שבוע יום השנה',
               '$name · $heb · מתחיל בערב ${_dmy(eve)}'),
           (tz.TZDateTime(tz.local, eve.year, eve.month, eve.day, 12), 'הערב מתחיל יום השנה', '$name · $heb'),
         ]) {
           final nid = id * 10 + k++;
-          if (when.isBefore(now)) continue;
-          await _n.zonedSchedule(nid, title, body, when, details,
+          if (at.isBefore(now)) continue;
+          await _n.zonedSchedule(nid, title, body, at, details,
               androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
               uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
               payload: '$id|${r['cem']}');
