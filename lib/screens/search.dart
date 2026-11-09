@@ -320,11 +320,19 @@ class _SearchScreenState extends State<SearchScreen> {
       body: SafeArea(
         child: Column(children: [
           if (_update != null)
-            MaterialBanner(
-              leading: Icon(Icons.system_update, color: cs.primary),
-              content: Text(t.updateAvail, style: const TextStyle(fontWeight: FontWeight.bold)),
-              actions: [
+            // בולט בצבע הזהב של הסיכה, כדי שלא ייבלע בצבעי האפליקציה
+            Container(
+              color: const Color(0xFFE0A83A),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: Row(children: [
+                const Icon(Icons.system_update, color: Color(0xFF2B1E00), size: 28),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(t.updateAvail,
+                      style: const TextStyle(color: Color(0xFF2B1E00), fontWeight: FontWeight.bold, fontSize: 15)),
+                ),
                 TextButton(
+                  style: TextButton.styleFrom(foregroundColor: const Color(0xFF2B1E00)),
                   onPressed: () {
                     skipUpdate(_update!.$1);
                     setState(() => _update = null);
@@ -332,9 +340,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: Text(t.notNowUpdate),
                 ),
                 FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2B1E00), foregroundColor: Colors.white),
                   onPressed: () => launchUrl(Uri.parse(_update!.$2), mode: LaunchMode.externalApplication),
                   child: Text(t.update),
                 ),
+              ]),
+            ),
               ],
             ),
           Padding(
