@@ -2,7 +2,8 @@
 import re, pathlib
 p = pathlib.Path('android/app/src/main/AndroidManifest.xml')
 s = p.read_text(encoding='utf-8')
-perms = ['android.permission.INTERNET', 'android.permission.ACCESS_FINE_LOCATION', 'android.permission.ACCESS_COARSE_LOCATION']
+perms = ['android.permission.INTERNET', 'android.permission.ACCESS_FINE_LOCATION', 'android.permission.ACCESS_COARSE_LOCATION',
+         'android.permission.POST_NOTIFICATIONS', 'android.permission.RECEIVE_BOOT_COMPLETED']
 add = ''.join(f'    <uses-permission android:name="{x}"/>\n' for x in perms if x not in s)
 s = s.replace('<application', add + '    <application', 1) if add else s
 s = re.sub(r'android:label="[^"]*"', 'android:label="Grave Marker"', s, count=1)
@@ -10,8 +11,29 @@ if '<queries>' in s and 'android.intent.action.VIEW' not in s.split('<queries>')
     s = s.replace('<queries>', '<queries>\n        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https"/></intent>', 1)
 elif '<queries>' not in s:
     s = s.replace('</manifest>', '    <queries>\n        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https"/></intent>\n    </queries>\n</manifest>')
+# תזכורות ליום השנה (flutter_local_notifications)
+if 'ScheduledNotificationReceiver' not in s:
+    s = s.replace('</application>', '''    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+    </application>''', 1)
 p.write_text(s, encoding='utf-8')
 print(s)
+
+# desugaring – נדרש לספריית ההתראות
+g = pathlib.Path('android/app/build.gradle.kts')
+gs = g.read_text(encoding='utf-8')
+if 'isCoreLibraryDesugaringEnabled' not in gs:
+    gs = gs.replace('compileOptions {', 'compileOptions {\n        isCoreLibraryDesugaringEnabled = true', 1)
+    gs += '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n'
+    g.write_text(gs, encoding='utf-8')
+print('desugaring', 'isCoreLibraryDesugaringEnabled' in gs)
 
 # אייקון האפליקציה
 import shutil

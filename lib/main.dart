@@ -5,6 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data.dart';
 import 'l10n/app_localizations.dart';
+import 'reminders.dart';
+import 'screens/detail.dart';
 import 'screens/search.dart';
 import 'screens/welcome.dart';
 
@@ -14,14 +16,36 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final blessed = prefs.getInt('blessed') ?? 0;
   final showWelcome = DateTime.now().millisecondsSinceEpoch - blessed > const Duration(days: 30).inMilliseconds;
+  try {
+    await Reminders.init();
+    Reminders.reschedule();
+  } catch (_) {}
   runApp(GraveMarkerApp(showWelcome: showWelcome));
 }
 
 const teal = Color(0xFF1F5B57);
+final navKey = GlobalKey<NavigatorState>();
 
-class GraveMarkerApp extends StatelessWidget {
+void _open(int id, String cem) {
+  final nav = navKey.currentState;
+  if (nav != null) openFromReminder(nav, id, cem, (d, c) => DetailScreen(deceased: d, cemetery: c));
+}
+
+class GraveMarkerApp extends StatefulWidget {
   final bool showWelcome;
   const GraveMarkerApp({super.key, required this.showWelcome});
+  @override
+  State<GraveMarkerApp> createState() => _GraveMarkerAppState();
+}
+
+class _GraveMarkerAppState extends State<GraveMarkerApp> {
+  @override
+  void initState() {
+    super.initState();
+    Reminders.onOpen = _open;
+    final l = Reminders.launchedFrom;
+    if (l != null) WidgetsBinding.instance.addPostFrameCallback((_) => _open(l.$1, l.$2));
+  }
 
   ThemeData _theme(Brightness b) {
     final dark = b == Brightness.dark;
@@ -43,6 +67,7 @@ class GraveMarkerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navKey,
       onGenerateTitle: (c) => AppLocalizations.of(c).appTitle,
       debugShowCheckedModeBanner: false,
       theme: _theme(Brightness.light),
@@ -55,7 +80,7 @@ class GraveMarkerApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: showWelcome ? const WelcomeScreen() : const SearchScreen(),
+      home: widget.showWelcome ? const WelcomeScreen() : const SearchScreen(),
     );
   }
 }

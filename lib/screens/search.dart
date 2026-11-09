@@ -220,7 +220,11 @@ class _SearchScreenState extends State<SearchScreen> {
           ListTile(leading: const Icon(Icons.local_florist_outlined), title: Text(t.ashkava), onTap: () => web('$webBase/ashkava/')),
           ListTile(leading: const Icon(Icons.language), title: Text(t.website), onTap: () => web(webBase)),
           const Divider(),
-          ListTile(leading: const Icon(Icons.edit_location_alt_outlined), title: Text(t.editors), onTap: () => web('$webBase/marker/')),
+          ListTile(leading: const Icon(Icons.edit_location_alt_outlined), title: Text(t.editors), onTap: () {
+                Navigator.of(context).pop();
+                // נפתח בתוך האפליקציה; הכניסה לחשבון נשמרת
+                launchUrl(Uri.parse('$webBase/marker/'), mode: LaunchMode.inAppBrowserView);
+              }),
           ListTile(leading: const Icon(Icons.info_outline), title: Text(t.builtBy), onTap: () => web('https://bulu.ltd')),
           if (appBuild > 0)
             ListTile(

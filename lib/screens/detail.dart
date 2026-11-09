@@ -16,6 +16,7 @@ import '../geo.dart';
 import '../hebcal.dart';
 import '../l10n/app_localizations.dart';
 import '../offline.dart';
+import '../reminders.dart';
 import 'actions.dart';
 import 'search.dart';
 
@@ -38,6 +39,7 @@ class _DetailScreenState extends State<DetailScreen> {
   double? _heading, _meAcc;
   List<String> _photos = [];
   File? _overlayFile;
+  bool _remind = false;
   bool _locDenied = false, _asked = true, _saving = false;
   String? _saveCountdown;
   StreamSubscription<Position>? _posSub;
@@ -65,6 +67,9 @@ class _DetailScreenState extends State<DetailScreen> {
     _asked = prefs.getBool('asked:${d.id}') ?? false;
     Offline.overlay(cem.id).then((f) {
       if (f != null && mounted) setState(() => _overlayFile = f);
+    });
+    Reminders.isOn(d.id).then((v) {
+      if (mounted) setState(() => _remind = v);
     });
     approvedPhotos(d.id).then((p) {
       if (mounted) setState(() => _photos = p);
@@ -187,6 +192,19 @@ class _DetailScreenState extends State<DetailScreen> {
       final g = await Repo.graveLocation(d.id);
       if (g != null && mounted) setState(() => _grave = g);
     }
+  }
+
+  Future<void> _toggleRemind() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final v = await Reminders.toggle(d);
+    if (!mounted) return;
+    if (v == null) {
+      messenger.showSnackBar(SnackBar(content: Text(t.remindNoPerm)));
+      return;
+    }
+    setState(() => _remind = v);
+    messenger.showSnackBar(SnackBar(content: Text(v ? t.remindOn : t.remindOff)));
   }
 
   void _drive() {
@@ -368,6 +386,19 @@ class _DetailScreenState extends State<DetailScreen> {
                     Text(HebCal.format(yz.heb), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     Text(t.startsEve(dows[yz.date.weekday % 7], dmy(yz.date)),
                         style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
+                    const SizedBox(height: 6),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: _remind
+                          ? FilledButton.tonalIcon(
+                              onPressed: _toggleRemind,
+                              icon: const Icon(Icons.notifications_active),
+                              label: Text(t.remindIsOn))
+                          : OutlinedButton.icon(
+                              onPressed: _toggleRemind,
+                              icon: const Icon(Icons.notifications_none),
+                              label: Text(t.remindSet)),
+                    ),
                   ],
                   const SizedBox(height: 12),
                   Row(children: [

@@ -124,5 +124,10 @@
   "placeholders": {
    "n": {}
   }
- }
+ },
+ "remindSet": "Yahrzeit reminder",
+ "remindIsOn": "Reminder on",
+ "remindOn": "Reminder set: a week before, and on the afternoon before the yahrzeit begins",
+ "remindOff": "Reminder cancelled",
+ "remindNoPerm": "To get reminders, allow notifications in the phone settings"
 }
