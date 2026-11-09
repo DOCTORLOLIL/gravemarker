@@ -197,5 +197,14 @@
  "send": "שליחה",
  "cancel": "ביטול",
  "reportShort": "כתבו כמה מילים על מה שמצאתם",
- "reportThanks": "תודה! הדיווח הגיע לצוות"
+ "reportThanks": "תודה! הדיווח הגיע לצוות",
+ "updateAvail": "קיימת גרסה חדשה של האפליקציה",
+ "update": "עדכון",
+ "notNowUpdate": "לא עכשיו",
+ "version": "גרסה {n}",
+ "@version": {
+  "placeholders": {
+   "n": {}
+  }
+ }
 }

@@ -115,5 +115,14 @@
  "send": "Send",
  "cancel": "Cancel",
  "reportShort": "Please write a few words",
- "reportThanks": "Thanks! The report was sent"
+ "reportThanks": "Thanks! The report was sent",
+ "updateAvail": "A new version of the app is available",
+ "update": "Update",
+ "notNowUpdate": "Not now",
+ "version": "Version {n}",
+ "@version": {
+  "placeholders": {
+   "n": {}
+  }
+ }
 }

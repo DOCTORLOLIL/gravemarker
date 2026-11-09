@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../data.dart';
 import '../l10n/app_localizations.dart';
 import '../offline.dart';
+import '../update.dart';
 import 'contacts.dart';
 import 'detail.dart';
 import 'welcome.dart';
@@ -41,7 +42,8 @@ class _SearchScreenState extends State<SearchScreen> {
   String? _msg;
   bool _busy = false;
   DateTime? _savedAt;
-  int? _saveN; // מספר הרשומות שנשמרו עד כה (בזמן שמירה)
+  int? _saveN;
+  (int, String)? _update; // מספר הרשומות שנשמרו עד כה (בזמן שמירה)
 
   Future<void> _refreshSaved() async {
     final c = _cem;
@@ -73,6 +75,9 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _load();
+    checkUpdate().then((u) {
+      if (u != null && mounted) setState(() => _update = u);
+    });
   }
 
   Future<void> _load() async {
@@ -217,6 +222,13 @@ class _SearchScreenState extends State<SearchScreen> {
           const Divider(),
           ListTile(leading: const Icon(Icons.edit_location_alt_outlined), title: Text(t.editors), onTap: () => web('$webBase/marker/')),
           ListTile(leading: const Icon(Icons.info_outline), title: Text(t.builtBy), onTap: () => web('https://bulu.ltd')),
+          if (appBuild > 0)
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.system_update_outlined),
+              title: Text(t.version('$appBuild')),
+              onTap: () => web('$webBase/download/'),
+            ),
         ]),
       ),
     );
@@ -255,6 +267,24 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: SafeArea(
         child: Column(children: [
+          if (_update != null)
+            MaterialBanner(
+              leading: Icon(Icons.system_update, color: cs.primary),
+              content: Text(t.updateAvail, style: const TextStyle(fontWeight: FontWeight.bold)),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    skipUpdate(_update!.$1);
+                    setState(() => _update = null);
+                  },
+                  child: Text(t.notNowUpdate),
+                ),
+                FilledButton(
+                  onPressed: () => launchUrl(Uri.parse(_update!.$2), mode: LaunchMode.externalApplication),
+                  child: Text(t.update),
+                ),
+              ],
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Row(children: [
