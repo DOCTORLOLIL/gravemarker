@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
@@ -22,11 +21,6 @@ class Reminders {
   static Future<void> init() async {
     if (_ready) return;
     tzdata.initializeTimeZones();
-    try {
-      tz.setLocalLocation(tz.getLocation(await FlutterTimezone.getLocalTimezone()));
-    } catch (_) {
-      tz.setLocalLocation(tz.getLocation('Asia/Jerusalem'));
-    }
     await _n.initialize(
       const InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher')),
       onDidReceiveNotificationResponse: (r) {
@@ -76,7 +70,9 @@ class Reminders {
   static Future<void> reschedule() async {
     await init();
     await _n.cancelAll();
-    final now = tz.TZDateTime.now(tz.local);
+    final now = tz.TZDateTime.now(tz.UTC);
+    // שעה מקומית בטלפון → UTC
+    tz.TZDateTime at0(DateTime d, int h) => tz.TZDateTime.from(DateTime(d.year, d.month, d.day, h), tz.UTC);
     const details = NotificationDetails(
       android: AndroidNotificationDetails('yahrzeit', 'תזכורות ליום השנה',
           channelDescription: 'תזכורת שבוע לפני יום השנה ובערב שבו הוא מתחיל', importance: Importance.high),
@@ -91,9 +87,9 @@ class Reminders {
         final eve = y.date.subtract(const Duration(days: 1));
         final week = y.date.subtract(const Duration(days: 7));
         for (final (at, title, body) in [
-          (tz.TZDateTime(tz.local, week.year, week.month, week.day, 10), 'בעוד שבוע יום השנה',
+          (at0(week, 10), 'בעוד שבוע יום השנה',
               '$name · $heb · מתחיל בערב ${_dmy(eve)}'),
-          (tz.TZDateTime(tz.local, eve.year, eve.month, eve.day, 12), 'הערב מתחיל יום השנה', '$name · $heb'),
+          (at0(eve, 12), 'הערב מתחיל יום השנה', '$name · $heb'),
         ]) {
           final nid = id * 10 + k++;
           if (at.isBefore(now)) continue;
