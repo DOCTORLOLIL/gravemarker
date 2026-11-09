@@ -26,12 +26,24 @@ jobs:
           flutter create --platforms=android --org ltd.bulu --project-name gravemarker .
           rm -rf test
           python3 tool/patch_android.py
+      - name: מפתח חתימה קבוע
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > android/app/upload.jks
+            printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=upload\nstoreFile=upload.jks\n' "$KEYSTORE_PASSWORD" "$KEYSTORE_PASSWORD" > android/key.properties
+            python3 tool/patch_signing.py
+          else
+            echo "::warning::אין מפתח חתימה קבוע – הגרסה נחתמת במפתח זמני ולא תתעדכן מעל גרסה קודמת"
+          fi
       - run: flutter pub get
       - run: flutter gen-l10n
       - name: בדיקת קוד
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: בניית APK
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --build-number=${{ github.run_number }}
       - uses: actions/upload-artifact@v4
         with:
           name: apk
