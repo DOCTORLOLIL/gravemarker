@@ -52,6 +52,14 @@ class _SearchScreenState extends State<SearchScreen> {
     if (c == null) return;
     final at = await Offline.savedAt(c.id);
     if (mounted && _cem?.id == c.id) setState(() => _savedAt = at);
+    // עדכון אוטומטי של השמירה פעם בשבוע, כדי שנפטרים חדשים יופיעו גם בלי קליטה
+    if (at != null && DateTime.now().difference(at).inDays >= 7 && !Repo.offline && _saveN == null) {
+      try {
+        await Offline.save(c, (_) {});
+        final now = await Offline.savedAt(c.id);
+        if (mounted && _cem?.id == c.id) setState(() => _savedAt = now);
+      } catch (_) {}
+    }
   }
 
   static const _langNames = {'he': 'עברית', 'en': 'English', 'fr': 'Français', 'ru': 'Русский', 'am': 'አማርኛ'};
