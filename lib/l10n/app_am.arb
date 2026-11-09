@@ -132,5 +132,7 @@
  "notifChannelDesc": "ከመታሰቢያ ቀኑ አንድ ሳምንት በፊት እና በሚጀምርበት ምሽት ማስታወሻ",
  "notifWeekTitle": "የመታሰቢያ ቀን በአንድ ሳምንት ውስጥ",
  "notifWeekBody": "{name} · {heb} · በ{eve} ምሽት ይጀምራል",
- "notifEveTitle": "የመታሰቢያ ቀኑ ዛሬ ምሽት ይጀምራል"
+ "notifEveTitle": "የመታሰቢያ ቀኑ ዛሬ ምሽት ይጀምራል",
+ "feedback": "አስተያየት ይላኩ",
+ "privacy": "የግላዊነት መመሪያ"
 }

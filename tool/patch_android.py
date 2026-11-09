@@ -7,6 +7,7 @@ perms = ['android.permission.INTERNET', 'android.permission.ACCESS_FINE_LOCATION
 add = ''.join(f'    <uses-permission android:name="{x}"/>\n' for x in perms if x not in s)
 s = s.replace('<application', add + '    <application', 1) if add else s
 s = re.sub(r'android:label="[^"]*"', 'android:label="Grave Marker"', s, count=1)
+MAILTO = '<intent><action android:name="android.intent.action.SENDTO"/><data android:scheme="mailto"/></intent>'
 if '<queries>' in s and 'android.intent.action.VIEW' not in s.split('<queries>')[1]:
     s = s.replace('<queries>', '<queries>\n        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https"/></intent>', 1)
 elif '<queries>' not in s:
@@ -23,6 +24,8 @@ if 'ScheduledNotificationReceiver' not in s:
             </intent-filter>
         </receiver>
     </application>''', 1)
+if 'android:scheme="mailto"' not in s:
+    s = s.replace('<queries>', '<queries>\n        ' + MAILTO, 1)
 p.write_text(s, encoding='utf-8')
 print(s)
 

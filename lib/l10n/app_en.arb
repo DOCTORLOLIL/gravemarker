@@ -137,5 +137,7 @@
  "notifChannelDesc": "A reminder a week before the yahrzeit and on the evening it begins",
  "notifWeekTitle": "Yahrzeit in one week",
  "notifWeekBody": "{name} · {heb} · begins on the evening of {eve}",
- "notifEveTitle": "The yahrzeit begins this evening"
+ "notifEveTitle": "The yahrzeit begins this evening",
+ "feedback": "Send feedback",
+ "privacy": "Privacy policy"
 }

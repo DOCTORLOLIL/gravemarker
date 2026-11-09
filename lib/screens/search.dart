@@ -273,6 +273,12 @@ class _SearchScreenState extends State<SearchScreen> {
               _pickLang();
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.mail_outline),
+            title: Text(t.feedback),
+            onTap: () => launchUrl(Uri.parse('mailto:ceo@bulu.ltd?subject=${Uri.encodeComponent('Grave Marker – ${t.feedback}')}')),
+          ),
+          ListTile(leading: const Icon(Icons.privacy_tip_outlined), title: Text(t.privacy), onTap: () => web('$webBase/privacy/')),
           ListTile(leading: const Icon(Icons.info_outline), title: Text(t.builtBy), onTap: () => web('https://bulu.ltd')),
           if (appBuild > 0)
             ListTile(
