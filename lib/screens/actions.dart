@@ -18,8 +18,8 @@ double? _deg(IfdTag? tag, IfdTag? ref) {
   if (tag == null) return null;
   try {
     final List v = (tag.values as dynamic).toList();
-    double num(dynamic x) => x is num ? x.toDouble() : (x.numerator as int) / (x.denominator as int);
-    var d = num(v[0]) + num(v[1]) / 60 + num(v[2]) / 3600;
+    double toD(dynamic x) => x is num ? x.toDouble() : (x.numerator as int) / (x.denominator as int);
+    var d = toD(v[0]) + toD(v[1]) / 60 + toD(v[2]) / 3600;
     final r = ref?.printable ?? '';
     if (r.startsWith('S') || r.startsWith('W')) d = -d;
     return d.isFinite ? d : null;
