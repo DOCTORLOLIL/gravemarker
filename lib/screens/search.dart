@@ -346,8 +346,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ]),
             ),
-              ],
-            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Row(children: [
