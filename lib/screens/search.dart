@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../data.dart';
 import '../l10n/app_localizations.dart';
+import '../offline.dart';
 import 'contacts.dart';
 import 'detail.dart';
 import 'welcome.dart';
@@ -39,6 +40,34 @@ class _SearchScreenState extends State<SearchScreen> {
   List<Deceased>? _res;
   String? _msg;
   bool _busy = false;
+  DateTime? _savedAt;
+  int? _saveN; // מספר הרשומות שנשמרו עד כה (בזמן שמירה)
+
+  Future<void> _refreshSaved() async {
+    final c = _cem;
+    if (c == null) return;
+    final at = await Offline.savedAt(c.id);
+    if (mounted && _cem?.id == c.id) setState(() => _savedAt = at);
+  }
+
+  Future<void> _saveOffline() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final c = _cem;
+    if (c == null || _saveN != null) return;
+    setState(() => _saveN = 0);
+    try {
+      await Offline.save(c, (n) {
+        if (mounted) setState(() => _saveN = n);
+      });
+      messenger.showSnackBar(SnackBar(content: Text(t.offlineDone)));
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(t.offlineFailed)));
+    } finally {
+      if (mounted) setState(() => _saveN = null);
+      _refreshSaved();
+    }
+  }
 
   @override
   void initState() {
@@ -54,9 +83,11 @@ class _SearchScreenState extends State<SearchScreen> {
       setState(() {
         _cems = cems;
         _cem = cems.where((c) => c.id == last).firstOrNull ?? cems.firstOrNull;
+        if (Repo.offline) _msg = AppLocalizations.of(context).offlineMode;
       });
+      _refreshSaved();
     } catch (_) {
-      if (mounted) setState(() => _msg = AppLocalizations.of(context).loadError);
+      if (mounted) setState(() => _msg = AppLocalizations.of(context).noOfflineData);
     }
   }
 
@@ -74,10 +105,11 @@ class _SearchScreenState extends State<SearchScreen> {
       final r = await Repo.search(_cem!.id, raw);
       setState(() {
         _res = r;
-        _msg = r.isEmpty ? t.noResults : (r.length >= 60 ? t.tooMany : t.resultsCount(r.length));
+        _msg = (Repo.offline ? '${t.offlineMode}\n' : '') +
+            (r.isEmpty ? t.noResults : (r.length >= 60 ? t.tooMany : t.resultsCount(r.length)));
       });
     } catch (_) {
-      setState(() => _msg = t.loadError);
+      setState(() => _msg = _savedAt == null ? t.noOfflineData : t.loadError);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -92,6 +124,35 @@ class _SearchScreenState extends State<SearchScreen> {
       (Icons.share_outlined, t.featShare, t.featShareSub),
     ];
     return ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: [
+      if (_cem != null)
+        Card(
+          margin: const EdgeInsets.only(bottom: 10),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(children: [
+              Icon(_savedAt == null ? Icons.download_for_offline_outlined : Icons.offline_pin_outlined, color: cs.primary),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(t.offlineTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(
+                    _saveN != null
+                        ? t.offlineSaving('$_saveN')
+                        : _savedAt == null
+                            ? t.offlineBody
+                            : t.offlineSaved(_cem!.town, dmy(_savedAt!)),
+                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
+                  ),
+                ]),
+              ),
+              const SizedBox(width: 8),
+              FilledButton.tonal(
+                onPressed: _saveN != null ? null : _saveOffline,
+                child: Text(_savedAt == null ? t.offlineSave : t.offlineUpdate),
+              ),
+            ]),
+          ),
+        ),
       GridView.count(
         crossAxisCount: 2,
         shrinkWrap: true,
@@ -183,7 +244,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   setState(() {
                     _cem = c;
                     _res = null;
+                    _savedAt = null;
                   });
+                  _refreshSaved();
                   if (_q.text.trim().isNotEmpty) _search();
                 },
               ),

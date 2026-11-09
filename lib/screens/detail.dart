@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ import '../data.dart';
 import '../geo.dart';
 import '../hebcal.dart';
 import '../l10n/app_localizations.dart';
+import '../offline.dart';
+import 'actions.dart';
 import 'search.dart';
 
 const graveRed = Color(0xFFDC1E1E);
@@ -32,7 +35,9 @@ class _DetailScreenState extends State<DetailScreen> {
   List<Plot> _plots = [];
   List<LatLng>? _targetRing;
   LatLng? _est, _grave, _me;
-  double? _heading;
+  double? _heading, _meAcc;
+  List<String> _photos = [];
+  File? _overlayFile;
   bool _locDenied = false, _asked = true, _saving = false;
   String? _saveCountdown;
   StreamSubscription<Position>? _posSub;
@@ -58,6 +63,12 @@ class _DetailScreenState extends State<DetailScreen> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     _asked = prefs.getBool('asked:${d.id}') ?? false;
+    Offline.overlay(cem.id).then((f) {
+      if (f != null && mounted) setState(() => _overlayFile = f);
+    });
+    approvedPhotos(d.id).then((p) {
+      if (mounted) setState(() => _photos = p);
+    });
     try {
       final plots = await Repo.plots(cem.id);
       final t = plots.where((p) => p.plot == d.plot && p.gush == (d.gush ?? '1') && p.ring != null).firstOrNull;
@@ -93,7 +104,10 @@ class _DetailScreenState extends State<DetailScreen> {
     }
     _posSub = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.best, distanceFilter: 1),
-    ).listen((p) => setState(() => _me = LatLng(p.latitude, p.longitude)));
+    ).listen((p) => setState(() {
+          _me = LatLng(p.latitude, p.longitude);
+          _meAcc = p.accuracy;
+        }));
     _compSub = FlutterCompass.events?.listen((e) {
       if (e.heading != null) setState(() => _heading = e.heading);
     });
@@ -167,6 +181,14 @@ class _DetailScreenState extends State<DetailScreen> {
     setState(() => _asked = true);
   }
 
+  Future<void> _photo() async {
+    final saved = await attachPhoto(context, d, _target, _me, _meAcc);
+    if (saved) {
+      final g = await Repo.graveLocation(d.id);
+      if (g != null && mounted) setState(() => _grave = g);
+    }
+  }
+
   void _drive() {
     final c = cem.center;
     if (c == null) return;
@@ -224,7 +246,7 @@ class _DetailScreenState extends State<DetailScreen> {
                       bottomLeftCorner: corners[2],
                       bottomRightCorner: LatLng(corners[1].latitude + corners[2].latitude - corners[0].latitude,
                           corners[1].longitude + corners[2].longitude - corners[0].longitude),
-                      imageProvider: NetworkImage(cem.overlayUrl!),
+                      imageProvider: _overlayFile != null ? FileImage(_overlayFile!) : NetworkImage(cem.overlayUrl!) as ImageProvider,
                     ),
                   ]),
                 PolygonLayer(polygons: [
@@ -359,6 +381,36 @@ class _DetailScreenState extends State<DetailScreen> {
                     const SizedBox(width: 8),
                     Expanded(child: FilledButton.tonal(onPressed: _ashkava, child: Text(t.ashkava))),
                   ]),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: _photo,
+                    icon: const Icon(Icons.add_a_photo_outlined),
+                    label: Text(t.attachPhoto),
+                  ),
+                  if (_photos.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 96,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _photos.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 6),
+                        itemBuilder: (c, i) => GestureDetector(
+                          onTap: () => launchUrl(Uri.parse(_photos[i]), mode: LaunchMode.externalApplication),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(_photos[i], width: 96, height: 96, fit: BoxFit.cover),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  Center(
+                    child: TextButton(
+                      onPressed: () => reportDialog(context, d),
+                      child: Text(t.report, style: TextStyle(color: cs.onSurfaceVariant)),
+                    ),
+                  ),
                 ]),
               ),
             ),

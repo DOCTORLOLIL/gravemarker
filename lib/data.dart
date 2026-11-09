@@ -1,6 +1,8 @@
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'offline.dart';
+
 const supabaseUrl = 'https://vqydrrhgklikhfdsgrwr.supabase.co';
 const supabaseKey = 'sb_publishable_w6o5yCjbhBkuJ2FREujpHA_1V8ZcY0C'; // מפתח ציבורי – מותר באפליקציה
 const webBase = 'https://gravemarker.bulu.ltd';
@@ -61,18 +63,39 @@ class Deceased {
   String get shareUrl => '$webBase/?c=$cemeteryId&d=$id';
 }
 
-const _cols =
+const deceasedCols =
     'id,cemetery_id,first_name,last_name,alt_name,father_name,mother_name,gush,plot,row_no,grave_no,death_date,death_date_hebrew';
 
 class Repo {
+  /// true כשהנתון האחרון הגיע מהשמירה בטלפון
+  static bool offline = false;
+
   static Future<List<Cemetery>> cemeteries() async {
-    final r = await db.from('cemeteries').select().order('name');
-    return (r as List).map((e) => Cemetery.fromJson(e)).toList();
+    try {
+      final r = await db.from('cemeteries').select().order('name').timeout(const Duration(seconds: 8));
+      offline = false;
+      return (r as List).map((e) => Cemetery.fromJson(e)).toList();
+    } catch (e) {
+      final c = await Offline.cemeteries();
+      if (c == null) rethrow;
+      offline = true;
+      return c;
+    }
   }
 
   static Future<List<Plot>> plots(String cemeteryId) async {
-    final r = await db.from('plots').select('gush,plot,boundary').eq('cemetery_id', cemeteryId);
-    return (r as List).map((e) => Plot.fromJson(e)).toList();
+    try {
+      final r = await db
+          .from('plots')
+          .select('gush,plot,boundary')
+          .eq('cemetery_id', cemeteryId)
+          .timeout(const Duration(seconds: 8));
+      return (r as List).map((e) => Plot.fromJson(e)).toList();
+    } catch (e) {
+      final p = await Offline.plots(cemeteryId);
+      if (p == null) rethrow;
+      return p;
+    }
   }
 
   /// חיפוש: המילה הארוכה בשרת, השאר מסוננות במכשיר
@@ -86,7 +109,18 @@ class Repo {
     if (words.isEmpty) return [];
     final years = words.where((w) => RegExp(r'^\d{4}$').hasMatch(w)).toList();
     final names = words.where((w) => !years.contains(w)).toList()..sort((a, b) => b.length - a.length);
-    var q = db.from('deceased').select(_cols).eq('cemetery_id', cemeteryId);
+    final local = await Offline.deceased(cemeteryId);
+    try {
+      return await _searchServer(cemeteryId, names, years).timeout(const Duration(seconds: 8));
+    } catch (e) {
+      if (local == null) rethrow;
+      offline = true;
+      return Offline.search(local, names, years);
+    }
+  }
+
+  static Future<List<Deceased>> _searchServer(String cemeteryId, List<String> names, List<String> years) async {
+    var q = db.from('deceased').select(deceasedCols).eq('cemetery_id', cemeteryId);
     if (names.isNotEmpty) {
       final p = '*${names.first}*';
       q = q.or('last_name.ilike.$p,first_name.ilike.$p,alt_name.ilike.$p,father_name.ilike.$p,mother_name.ilike.$p');
@@ -98,29 +132,43 @@ class Repo {
     final all = (r as List).map((e) => Deceased.fromJson(e)).toList();
     bool has(Deceased d, String w) =>
         [d.lastName, d.firstName, d.altName, d.father, d.mother].any((f) => (f ?? '').contains(w));
+    offline = false;
     return all.where((d) => names.skip(1).every((w) => has(d, w))).take(60).toList();
   }
 
   static Future<Deceased?> deceased(int id) async {
-    final r = await db.from('deceased').select(_cols).eq('id', id).maybeSingle();
+    final r = await db.from('deceased').select(deceasedCols).eq('id', id).maybeSingle();
     return r == null ? null : Deceased.fromJson(r);
   }
 
+  static List<(int, int)> _sizeOf(Iterable<Deceased> list) =>
+      list.map((x) => (int.tryParse(x.row ?? '') ?? 0, int.tryParse(x.grave ?? '') ?? 0)).toList();
+
   /// מספר השורות בחלקה ומספר הקברים בשורה – לחישוב מיקום משוער
   static Future<(int rows, int graves)?> plotSize(Deceased d) async {
-    final r = await db
-        .from('deceased')
-        .select('row_no,grave_no')
-        .eq('cemetery_id', d.cemeteryId)
-        .eq('gush', d.gush ?? '1')
-        .eq('plot', d.plot!)
-        .limit(3000);
+    List<(int, int)> pairs;
+    try {
+      final r = await db
+          .from('deceased')
+          .select('row_no,grave_no')
+          .eq('cemetery_id', d.cemeteryId)
+          .eq('gush', d.gush ?? '1')
+          .eq('plot', d.plot!)
+          .limit(3000)
+          .timeout(const Duration(seconds: 8));
+      pairs = (r as List)
+          .map((x) => (int.tryParse('${x['row_no']}') ?? 0, int.tryParse('${x['grave_no']}') ?? 0))
+          .toList();
+    } catch (e) {
+      final local = await Offline.deceased(d.cemeteryId);
+      if (local == null) return null;
+      pairs = _sizeOf(local.where((x) => (x.gush ?? '1') == (d.gush ?? '1') && x.plot == d.plot));
+    }
     final row = int.tryParse(d.row ?? '');
     var nRows = 0, maxG = 0, maxGRow = 0;
-    for (final x in r as List) {
-      final a = int.tryParse('${x['row_no']}'), b = int.tryParse('${x['grave_no']}');
-      if (a != null && a > nRows) nRows = a;
-      if (b != null) {
+    for (final (a, b) in pairs) {
+      if (a > nRows) nRows = a;
+      if (b > 0) {
         if (b > maxG) maxG = b;
         if (a == row && b > maxGRow) maxGRow = b;
       }

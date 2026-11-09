@@ -158,5 +158,44 @@
  "featShare": "שיתוף",
  "featShareSub": "שולחים למשפחה קישור לקבר",
  "tagline": "איתור קברים וניווט עד הקבר",
- "ashkava": "השכבה"
+ "ashkava": "השכבה",
+ "offlineTitle": "שמירה לשימוש בלי קליטה",
+ "offlineBody": "שמרו את בית העלמין בטלפון כדי שהחיפוש והמפה יעבדו גם בלי קליטה (קל יותר מסרטון קצר בוואטסאפ).",
+ "offlineSaved": "{town} שמור בטלפון ({date}). עובד גם בלי קליטה.",
+ "@offlineSaved": {
+  "placeholders": {
+   "town": {},
+   "date": {}
+  }
+ },
+ "offlineSave": "שמירה",
+ "offlineUpdate": "עדכון",
+ "offlineSaving": "שומרים… {n}",
+ "@offlineSaving": {
+  "placeholders": {
+   "n": {}
+  }
+ },
+ "offlineDone": "נשמר. האפליקציה תעבוד גם בלי קליטה",
+ "offlineFailed": "השמירה לא הושלמה. נסו שוב כשהקליטה טובה.",
+ "offlineMode": "אין חיבור – מחפשים במידע השמור בטלפון",
+ "noOfflineData": "אין חיבור לאינטרנט. כשיש קליטה, שמרו את בית העלמין בטלפון.",
+ "attachPhoto": "צרף תמונה",
+ "attachPhotoSub": "צרף תמונת הקבר להנצחה",
+ "camera": "מצלמה",
+ "gallery": "גלריה",
+ "uploading": "מעלים את התמונה…",
+ "photoThanks": "תודה! התמונה תופיע אחרי אישור",
+ "photoLocSaved": ". מיקום הצילום נשמר כמיקום הקבר",
+ "uploadFailed": "ההעלאה לא הצליחה. נסו שוב בעוד רגע.",
+ "report": "דיווח על טעות או נזק",
+ "reportKindError": "פרט שגוי (שם, תאריך, מיקום)",
+ "reportKindDamage": "מצבה פגועה או מוזנחת",
+ "reportKindOther": "אחר",
+ "reportHint": "מה כדאי שנדע?",
+ "reportContact": "טלפון או מייל לחזרה (לא חובה)",
+ "send": "שליחה",
+ "cancel": "ביטול",
+ "reportShort": "כתבו כמה מילים על מה שמצאתם",
+ "reportThanks": "תודה! הדיווח הגיע לצוות"
 }
