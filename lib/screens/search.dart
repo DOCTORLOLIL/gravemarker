@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../data.dart';
 import '../l10n/app_localizations.dart';
 import '../offline.dart';
+import '../lang.dart';
 import '../update.dart';
 import 'contacts.dart';
 import 'detail.dart';
@@ -50,6 +51,45 @@ class _SearchScreenState extends State<SearchScreen> {
     if (c == null) return;
     final at = await Offline.savedAt(c.id);
     if (mounted && _cem?.id == c.id) setState(() => _savedAt = at);
+  }
+
+  static const _langNames = {'he': 'עברית', 'en': 'English', 'fr': 'Français', 'ru': 'Русский', 'am': 'አማርኛ'};
+
+  void _pickLang() {
+    final t = AppLocalizations.of(context);
+    final cur = Localizations.localeOf(context).languageCode;
+    final cs = Theme.of(context).colorScheme;
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (c) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
+            child: Text(t.language == 'Language' ? 'Language' : '${t.language} · Language',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+          ),
+          for (final code in langs)
+            ListTile(
+              title: Text(_langNames[code]!,
+                  style: code == cur ? TextStyle(color: cs.primary, fontWeight: FontWeight.bold) : null),
+              trailing: code == cur && appLang.value != null ? Icon(Icons.check, color: cs.primary) : null,
+              onTap: () {
+                Navigator.pop(c);
+                setLang(code);
+              },
+            ),
+          ListTile(
+            title: Text(t.langPhone, style: TextStyle(color: cs.onSurfaceVariant)),
+            trailing: appLang.value == null ? Icon(Icons.check, color: cs.primary) : null,
+            onTap: () {
+              Navigator.pop(c);
+              setLang(null);
+            },
+          ),
+        ]),
+      ),
+    );
   }
 
   Future<void> _saveOffline() async {
@@ -225,6 +265,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 // נפתח בתוך האפליקציה; הכניסה לחשבון נשמרת
                 launchUrl(Uri.parse('$webBase/marker/'), mode: LaunchMode.inAppBrowserView);
               }),
+          ListTile(
+            leading: const Icon(Icons.translate),
+            title: Text('${t.language} · ${t.langName}'),
+            onTap: () {
+              Navigator.of(context).pop();
+              _pickLang();
+            },
+          ),
           ListTile(leading: const Icon(Icons.info_outline), title: Text(t.builtBy), onTap: () => web('https://bulu.ltd')),
           if (appBuild > 0)
             ListTile(

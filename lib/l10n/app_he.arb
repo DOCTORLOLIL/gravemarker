@@ -211,5 +211,20 @@
  "remindIsOn": "תזכורת פעילה",
  "remindOn": "נקבעה תזכורת: שבוע לפני, ובצהרי היום שבערבו מתחיל יום השנה",
  "remindOff": "התזכורת בוטלה",
- "remindNoPerm": "כדי לקבל תזכורת צריך לאשר התראות בהגדרות הטלפון"
+ "remindNoPerm": "כדי לקבל תזכורת צריך לאשר התראות בהגדרות הטלפון",
+ "language": "שפה",
+ "langPhone": "לפי שפת הטלפון",
+ "langName": "עברית",
+ "notifChannel": "תזכורות ליום השנה",
+ "notifChannelDesc": "תזכורת שבוע לפני יום השנה ובערב שבו הוא מתחיל",
+ "notifWeekTitle": "בעוד שבוע יום השנה",
+ "notifWeekBody": "{name} · {heb} · מתחיל בערב {eve}",
+ "@notifWeekBody": {
+  "placeholders": {
+   "name": {},
+   "heb": {},
+   "eve": {}
+  }
+ },
+ "notifEveTitle": "הערב מתחיל יום השנה"
 }

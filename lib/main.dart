@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data.dart';
 import 'l10n/app_localizations.dart';
+import 'lang.dart';
 import 'reminders.dart';
 import 'screens/detail.dart';
 import 'screens/search.dart';
@@ -14,6 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseKey);
   final prefs = await SharedPreferences.getInstance();
+  appLang.value = prefs.getString('lang');
   final blessed = prefs.getInt('blessed') ?? 0;
   final showWelcome = DateTime.now().millisecondsSinceEpoch - blessed > const Duration(days: 30).inMilliseconds;
   try {
@@ -25,6 +27,7 @@ Future<void> main() async {
 
 const teal = Color(0xFF1F5B57);
 final navKey = GlobalKey<NavigatorState>();
+
 
 void _open(int id, String cem) {
   final nav = navKey.currentState;
@@ -66,13 +69,15 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ValueListenableBuilder<String?>(valueListenable: appLang, builder: (context, lang, _) => MaterialApp(
       navigatorKey: navKey,
       onGenerateTitle: (c) => AppLocalizations.of(c).appTitle,
       debugShowCheckedModeBanner: false,
       theme: _theme(Brightness.light),
       darkTheme: _theme(Brightness.dark),
-      locale: const Locale('he'),
+      locale: lang == null ? null : Locale(lang),
+      localeResolutionCallback: (device, supported) =>
+          langs.contains(device?.languageCode) ? Locale(device!.languageCode) : const Locale('he'),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -81,6 +86,6 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       home: widget.showWelcome ? const WelcomeScreen() : const SearchScreen(),
-    );
+    ));
   }
 }

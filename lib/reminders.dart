@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +10,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'data.dart';
 import 'hebcal.dart';
+import 'l10n/app_localizations.dart';
 
 /// תזכורות ליום השנה: שבוע לפני, ובצהרי היום שבערבו מתחיל יום השנה
 class Reminders {
@@ -70,12 +73,16 @@ class Reminders {
   static Future<void> reschedule() async {
     await init();
     await _n.cancelAll();
+    final prefs = await SharedPreferences.getInstance();
+    var lang = prefs.getString('lang') ?? Platform.localeName.split(RegExp('[_-]')).first;
+    if (!['he', 'en', 'fr', 'ru', 'am'].contains(lang)) lang = 'he';
+    final t = lookupAppLocalizations(Locale(lang));
     final now = tz.TZDateTime.now(tz.UTC);
     // שעה מקומית בטלפון → UTC
     tz.TZDateTime at0(DateTime d, int h) => tz.TZDateTime.from(DateTime(d.year, d.month, d.day, h), tz.UTC);
-    const details = NotificationDetails(
-      android: AndroidNotificationDetails('yahrzeit', 'תזכורות ליום השנה',
-          channelDescription: 'תזכורת שבוע לפני יום השנה ובערב שבו הוא מתחיל', importance: Importance.high),
+    final details = NotificationDetails(
+      android: AndroidNotificationDetails('yahrzeit', t.notifChannel,
+          channelDescription: t.notifChannelDesc, importance: Importance.high),
     );
     for (final r in await _list()) {
       final death = DateTime.tryParse(r['death'] ?? '');
@@ -87,9 +94,8 @@ class Reminders {
         final eve = y.date.subtract(const Duration(days: 1));
         final week = y.date.subtract(const Duration(days: 7));
         for (final (at, title, body) in [
-          (at0(week, 10), 'בעוד שבוע יום השנה',
-              '$name · $heb · מתחיל בערב ${_dmy(eve)}'),
-          (at0(eve, 12), 'הערב מתחיל יום השנה', '$name · $heb'),
+          (at0(week, 10), t.notifWeekTitle, t.notifWeekBody(name, heb, _dmy(eve))),
+          (at0(eve, 12), t.notifEveTitle, '$name · $heb'),
         ]) {
           final nid = id * 10 + k++;
           if (at.isBefore(now)) continue;
