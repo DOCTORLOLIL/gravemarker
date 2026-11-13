@@ -1,3 +1,4 @@
+import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import 'data.dart';
 import 'l10n/app_localizations.dart';
 import 'lang.dart';
 import 'reminders.dart';
+import 'stats.dart';
 import 'screens/detail.dart';
 import 'screens/search.dart';
 import 'screens/welcome.dart';
@@ -23,6 +25,8 @@ Future<void> main() async {
     Reminders.reschedule();
   } catch (_) {}
   runApp(GraveMarkerApp(showWelcome: showWelcome));
+  // ספירת התקנה כבר בפתיחה, גם אם המשתמש עוד במסך הפתיחה
+  pingInstall(appLang.value ?? PlatformDispatcher.instance.locale.languageCode);
 }
 
 const teal = Color(0xFF1F5B57);
