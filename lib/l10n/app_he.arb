@@ -228,5 +228,79 @@
  },
  "notifEveTitle": "הערב מתחיל יום השנה",
  "feedback": "שליחת משוב",
- "privacy": "מדיניות פרטיות"
+ "privacy": "מדיניות פרטיות",
+ "routeAdd": "הוספה לביקור המשפחתי",
+ "routeInVisit": "בביקור המשפחתי ✓",
+ "routeAdded": "נוסף לביקור המשפחתי",
+ "routeRemoved": "הוסר מהביקור המשפחתי",
+ "routeOpen": "לביקור",
+ "routeTitle": "הביקור המשפחתי",
+ "myRoutes": "המסלולים שלי",
+ "routeStats": "{n} קברים · כ-{m} מ' הליכה",
+ "routeCount": "{n} קברים",
+ "routeEmpty": "עוד אין קברים בביקור. פתחו כרטיס נפטר ולחצו \"הוספה לביקור המשפחתי\".",
+ "routeNext": "המשך ניווט לקבר הבא",
+ "routeAllDone": "ביקרתם בכל הקברים במסלול",
+ "routeShare": "שיתוף לבני המשפחה",
+ "routeMap": "מפה",
+ "routeSave": "שמירת המסלול",
+ "routeSaveHint": "שמרו את המסלול כדי לחזור אליו בביקור הבא",
+ "routeName": "שם המסלול",
+ "save": "שמירה",
+ "routeSaved": "המסלול נשמר",
+ "routeFamily": "משפחת {name}",
+ "routeGeneric": "ביקור בבית העלמין {town} {n}",
+ "routeDelete": "מחיקת המסלול",
+ "routeDeleteQ": "למחוק את המסלול \"{name}\"?",
+ "delete": "מחיקה",
+ "routeReset": "התחלה מחדש",
+ "routeNotSaved": "לא נשמר",
+ "routeFromPrev": "{m} מ' מהקודם",
+ "routeShareText": "מסלול ביקור בבית העלמין {cem}: {name}",
+ "routeEmail": "מייל",
+ "routeOther": "אפשרויות נוספות",
+ "arrivedTitle": "הגעתם לקבר",
+ "photoNow": "אין עדיין תמונה של הקבר. לצלם עכשיו? מיקום הצילום יעזור לאחרים למצוא את הקבר.",
+ "takePhoto": "צילום עכשיו",
+ "markNext": "✓ המשך לקבר הבא",
+ "stayHere": "להישאר כאן",
+ "routeDrag": "גררו את ≡ כדי לשנות את הסדר. החליקו הצידה כדי להסיר.",
+ "@routeStats": {
+  "placeholders": {
+   "n": {},
+   "m": {}
+  }
+ },
+ "@routeCount": {
+  "placeholders": {
+   "n": {}
+  }
+ },
+ "@routeFamily": {
+  "placeholders": {
+   "name": {}
+  }
+ },
+ "@routeGeneric": {
+  "placeholders": {
+   "town": {},
+   "n": {}
+  }
+ },
+ "@routeDeleteQ": {
+  "placeholders": {
+   "name": {}
+  }
+ },
+ "@routeFromPrev": {
+  "placeholders": {
+   "m": {}
+  }
+ },
+ "@routeShareText": {
+  "placeholders": {
+   "cem": {},
+   "name": {}
+  }
+ }
 }

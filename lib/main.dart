@@ -1,4 +1,6 @@
 import 'dart:ui' show PlatformDispatcher;
+
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +10,8 @@ import 'data.dart';
 import 'l10n/app_localizations.dart';
 import 'lang.dart';
 import 'reminders.dart';
+import 'routes.dart';
+import 'screens/route.dart';
 import 'stats.dart';
 import 'screens/detail.dart';
 import 'screens/search.dart';
@@ -46,10 +50,24 @@ class GraveMarkerApp extends StatefulWidget {
 }
 
 class _GraveMarkerAppState extends State<GraveMarkerApp> {
+  Future<void> _openRoute(Uri u) async {
+    final r = VisitRoute.fromUri(u);
+    final nav = navKey.currentState;
+    if (r == null || nav == null) return;
+    await RouteStore.setActive(r);
+    nav.push(MaterialPageRoute(builder: (_) => RouteScreen(route: r)));
+  }
+
   @override
   void initState() {
     super.initState();
     Reminders.onOpen = _open;
+    // קישור למסלול ששותף (gravemarker.bulu.ltd/r/...)
+    final links = AppLinks();
+    links.getInitialLink().then((u) {
+      if (u != null) WidgetsBinding.instance.addPostFrameCallback((_) => _openRoute(u));
+    });
+    links.uriLinkStream.listen(_openRoute);
     final l = Reminders.launchedFrom;
     if (l != null) WidgetsBinding.instance.addPostFrameCallback((_) => _open(l.$1, l.$2));
   }

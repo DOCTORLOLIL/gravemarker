@@ -24,6 +24,16 @@ if 'ScheduledNotificationReceiver' not in s:
             </intent-filter>
         </receiver>
     </application>''', 1)
+# קישורי מסלול (gravemarker.bulu.ltd/r/...) נפתחים באפליקציה
+if 'android:pathPrefix="/r"' not in s:
+    s = s.replace('</activity>', '''    <meta-data android:name="flutter_deeplinking_enabled" android:value="false"/>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="gravemarker.bulu.ltd" android:pathPrefix="/r"/>
+            </intent-filter>
+        </activity>''', 1)
 if 'android:scheme="mailto"' not in s:
     s = s.replace('<queries>', '<queries>\n        ' + MAILTO, 1)
 p.write_text(s, encoding='utf-8')

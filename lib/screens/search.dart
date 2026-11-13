@@ -6,6 +6,8 @@ import '../data.dart';
 import '../l10n/app_localizations.dart';
 import '../offline.dart';
 import '../lang.dart';
+import '../routes.dart';
+import 'route.dart';
 import '../update.dart';
 import '../stats.dart';
 import 'contacts.dart';
@@ -268,6 +270,25 @@ class _SearchScreenState extends State<SearchScreen> {
           if (_cem != null)
             ListTile(leading: const Icon(Icons.contacts_outlined), title: Text(t.contacts), onTap: () => go(ContactsScreen(cemetery: _cem!))),
           ListTile(leading: const Icon(Icons.auto_stories_outlined), title: Text(t.blessingLink), onTap: () => go(const WelcomeScreen(popOnly: true))),
+          ListTile(
+            leading: const Icon(Icons.star_outline),
+            title: Text(t.routeTitle),
+            onTap: () async {
+              final nav = Navigator.of(context)..pop();
+              final r = await RouteStore.active();
+              nav.push(MaterialPageRoute(
+                  builder: (_) => r == null ? const MyRoutesScreen() : RouteScreen(route: r)));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.route_outlined),
+            title: Text(t.myRoutes),
+            onTap: () {
+              Navigator.of(context)
+                ..pop()
+                ..push(MaterialPageRoute(builder: (_) => const MyRoutesScreen()));
+            },
+          ),
           ListTile(leading: const Icon(Icons.menu_book_outlined), title: Text(t.tefilon), onTap: () => web('$webBase/tefilon/')),
           ListTile(leading: const Icon(Icons.local_florist_outlined), title: Text(t.ashkava), onTap: () => web('$webBase/ashkava/')),
           ListTile(leading: const Icon(Icons.language), title: Text(t.website), onTap: () => web(webBase)),

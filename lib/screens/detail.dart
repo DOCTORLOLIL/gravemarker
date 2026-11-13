@@ -17,7 +17,9 @@ import '../hebcal.dart';
 import '../l10n/app_localizations.dart';
 import '../offline.dart';
 import '../reminders.dart';
+import '../routes.dart';
 import 'actions.dart';
+import 'route.dart';
 import 'search.dart';
 
 const graveRed = Color(0xFFDC1E1E);
@@ -26,7 +28,9 @@ const plotGold = Color(0xFFE0A83A);
 class DetailScreen extends StatefulWidget {
   final Deceased deceased;
   final Cemetery cemetery;
-  const DetailScreen({super.key, required this.deceased, required this.cemetery});
+  /// נפתח מתוך מסלול ביקור: בהגעה לקבר מוצגת תמונה/צילום וממשיכים לקבר הבא
+  final bool inRoute;
+  const DetailScreen({super.key, required this.deceased, required this.cemetery, this.inRoute = false});
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
@@ -39,7 +43,7 @@ class _DetailScreenState extends State<DetailScreen> {
   double? _heading, _meAcc;
   List<String> _photos = [];
   File? _overlayFile;
-  bool _remind = false;
+  bool _remind = false, _inVisit = false, _arrivalShown = false;
   bool _locDenied = false, _asked = true, _saving = false;
   String? _saveCountdown;
   StreamSubscription<Position>? _posSub;
@@ -67,6 +71,9 @@ class _DetailScreenState extends State<DetailScreen> {
     _asked = prefs.getBool('asked:${d.id}') ?? false;
     Offline.overlay(cem.id).then((f) {
       if (f != null && mounted) setState(() => _overlayFile = f);
+    });
+    RouteStore.contains(d.id).then((v) {
+      if (mounted) setState(() => _inVisit = v);
     });
     Reminders.isOn(d.id).then((v) {
       if (mounted) setState(() => _remind = v);
@@ -194,6 +201,80 @@ class _DetailScreenState extends State<DetailScreen> {
     }
   }
 
+  Future<void> _toggleVisit() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+    final v = await RouteStore.toggle(d);
+    if (!mounted) return;
+    setState(() => _inVisit = v);
+    messenger.showSnackBar(SnackBar(
+      content: Text(v ? t.routeAdded : t.routeRemoved),
+      action: v
+          ? SnackBarAction(
+              label: t.routeOpen,
+              onPressed: () async {
+                final r = await RouteStore.active();
+                if (r != null) nav.push(MaterialPageRoute(builder: (_) => RouteScreen(route: r)));
+              })
+          : null,
+    ));
+  }
+
+  /// הגעה לקבר במסלול: תמונת הקבר, או הצעה לצלם עכשיו
+  Future<void> _onArrive() async {
+    if (_arrivalShown || !widget.inRoute) return;
+    _arrivalShown = true;
+    final t = AppLocalizations.of(context);
+    final res = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (c) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(t.arrivedTitle, style: Theme.of(c).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text(d.fullName),
+            const SizedBox(height: 12),
+            if (_photos.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(_photos.first, height: MediaQuery.of(c).size.height * 0.35, fit: BoxFit.cover),
+              )
+            else if (_photoTaken)
+              Text(t.photoThanks)
+            else ...[
+              Text(t.photoNow),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.pop(c, 'photo'),
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: Text(t.takePhoto),
+              ),
+            ],
+            const SizedBox(height: 12),
+            FilledButton(onPressed: () => Navigator.pop(c, 'next'), child: Text(t.markNext)),
+            TextButton(onPressed: () => Navigator.pop(c, 'stay'), child: Text(t.stayHere)),
+          ]),
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (res == 'photo') {
+      await _photo();
+      _photoTaken = true;
+      _arrivalShown = false; // אחרי הצילום מציגים שוב עם האפשרות להמשיך
+      if (mounted) _onArrive();
+    } else if (res == 'next') {
+      Navigator.of(context).pop('next');
+    } else {
+      _stayed = true;
+    }
+  }
+
+  bool _stayed = false, _photoTaken = false;
+
   Future<void> _toggleRemind() async {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -238,6 +319,9 @@ class _DetailScreenState extends State<DetailScreen> {
     final t = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
     final nav = _nav(t);
+    if (nav.$2 && widget.inRoute && !_arrivalShown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _onArrive());
+    }
     final arrow = nav.$3 == null ? null : (nav.$3! - (_heading ?? 0)) * math.pi / 180;
     final yz = d.death == null ? null : HebCal.nextYahrzeits(d.death!, count: 1).firstOrNull;
     final dows = [t.dow0, t.dow1, t.dow2, t.dow3, t.dow4, t.dow5, t.dow6];
@@ -306,7 +390,7 @@ class _DetailScreenState extends State<DetailScreen> {
               start: 10,
               child: FloatingActionButton.small(
                 heroTag: 'back',
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(context).pop(_stayed ? 'done' : null),
                 child: const BackButtonIcon(),
               ),
             ),
@@ -412,6 +496,16 @@ class _DetailScreenState extends State<DetailScreen> {
                     const SizedBox(width: 8),
                     Expanded(child: FilledButton.tonal(onPressed: _ashkava, child: Text(t.ashkava))),
                   ]),
+                  const SizedBox(height: 8),
+                  _inVisit
+                      ? FilledButton.tonalIcon(
+                          onPressed: _toggleVisit, icon: const Icon(Icons.star), label: Text(t.routeInVisit))
+                      : FilledButton.icon(
+                          style: FilledButton.styleFrom(backgroundColor: plotGold, foregroundColor: const Color(0xFF2B1E00)),
+                          onPressed: _toggleVisit,
+                          icon: const Icon(Icons.star_border),
+                          label: Text(t.routeAdd, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ),
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
                     onPressed: _photo,
