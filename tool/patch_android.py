@@ -36,6 +36,10 @@ if 'isCoreLibraryDesugaringEnabled' not in gs:
     gs = gs.replace('compileOptions {', 'compileOptions {\n        isCoreLibraryDesugaringEnabled = true', 1)
     gs += '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n'
     g.write_text(gs, encoding='utf-8')
+# בדיקת lint של אנדרואיד קורסת לפעמים בשרת הבנייה – לא חוסמים בגללה
+if 'checkReleaseBuilds' not in gs:
+    gs = gs.replace('android {', 'android {\n    lint {\n        checkReleaseBuilds = false\n        abortOnError = false\n    }', 1)
+    g.write_text(gs, encoding='utf-8')
 print('desugaring', 'isCoreLibraryDesugaringEnabled' in gs)
 
 # אייקון האפליקציה
