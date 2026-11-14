@@ -200,5 +200,8 @@
  "azPast": "This memorial has already taken place",
  "shabbatMsg": "Out of respect for the departed, we keep Shabbat.\nTry it too.",
  "shabbatBack": "We'll be back after Shabbat, at {time} (Israel time).",
- "shabbatShalom": "Shabbat Shalom"
+ "shabbatShalom": "Shabbat Shalom",
+ "chagMsg": "Out of respect for the departed, we keep the holiday.\nTry it too.",
+ "chagBack": "We'll be back after the holiday, at {time} (Israel time).",
+ "chagSameach": "Chag Sameach"
 }

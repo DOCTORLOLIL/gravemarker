@@ -342,5 +342,13 @@
   "placeholders": {
    "time": {}
   }
+ },
+ "chagMsg": "לכבוד הנפטרים, אנחנו שומרים את החג.\nנסו גם אתם.",
+ "chagBack": "נחזור במוצאי החג, בשעה {time}.",
+ "chagSameach": "חג שמח",
+ "@chagBack": {
+  "placeholders": {
+   "time": {}
+  }
  }
 }

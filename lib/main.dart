@@ -64,7 +64,7 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
     nav.push(MaterialPageRoute(builder: (_) => RouteScreen(route: r)));
   }
 
-  DateTime? _shabbatEnd = Shabbat.end();
+  (DateTime, bool)? _shabbat = Shabbat.state();
   Timer? _shabbatTimer;
 
   @override
@@ -77,8 +77,8 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
   void initState() {
     super.initState();
     _shabbatTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-      final e = Shabbat.end();
-      if (e != _shabbatEnd) setState(() => _shabbatEnd = e);
+      final e = Shabbat.state();
+      if (e != _shabbat) setState(() => _shabbat = e);
     });
     Reminders.onOpen = _open;
     // קישור למסלול ששותף (gravemarker.bulu.ltd/r/...)
@@ -130,7 +130,7 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
       // בשבת: מסך שבת מעל כל האפליקציה
       builder: (context, child) => Stack(children: [
         if (child != null) child,
-        if (_shabbatEnd != null) ShabbatScreen(until: _shabbatEnd!),
+        if (_shabbat != null) ShabbatScreen(until: _shabbat!.$1, chag: _shabbat!.$2),
       ]),
     ));
   }
@@ -139,7 +139,8 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
 
 class ShabbatScreen extends StatelessWidget {
   final DateTime until;
-  const ShabbatScreen({super.key, required this.until});
+  final bool chag;
+  const ShabbatScreen({super.key, required this.until, this.chag = false});
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -152,14 +153,14 @@ class ShabbatScreen extends StatelessWidget {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               const Text('🕯️🕯️', style: TextStyle(fontSize: 56)),
               const SizedBox(height: 14),
-              Text(t.shabbatMsg,
+              Text(chag ? t.chagMsg : t.shabbatMsg,
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, height: 1.4)),
               const SizedBox(height: 18),
-              Text(t.shabbatBack(Shabbat.hhmm(until)),
+              Text((chag ? t.chagBack : t.shabbatBack)(Shabbat.hhmm(until)),
                   textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 16)),
               const SizedBox(height: 28),
-              Text(t.shabbatShalom, style: const TextStyle(color: Colors.white60, fontSize: 14)),
+              Text(chag ? t.chagSameach : t.shabbatShalom, style: const TextStyle(color: Colors.white60, fontSize: 14)),
             ]),
           ),
         ),

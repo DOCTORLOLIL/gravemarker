@@ -195,5 +195,8 @@
  "azPast": "Cette Hazkara a déjà eu lieu",
  "shabbatMsg": "Par respect pour les défunts, nous respectons le Chabbat.\nEssayez vous aussi.",
  "shabbatBack": "Nous serons de retour à la sortie du Chabbat, à {time} (heure d'Israël).",
- "shabbatShalom": "Chabbat Chalom"
+ "shabbatShalom": "Chabbat Chalom",
+ "chagMsg": "Par respect pour les défunts, nous respectons la fête.\nEssayez vous aussi.",
+ "chagBack": "Nous serons de retour à la sortie de la fête, à {time} (heure d'Israël).",
+ "chagSameach": "Hag Saméah"
 }
