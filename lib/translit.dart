@@ -135,6 +135,7 @@ String _word(String w, Map<String, String> sc) {
 String translit(String text, [String scheme = 'lat']) {
   final sc = _schemes[scheme] ?? _schemes['lat']!;
   final t = text
+      .replaceAllMapped(RegExp(r'\s*\([^()]*\)'), (m) => RegExp('[\u05B0-\u05BB\u05C7]').hasMatch(m[0]!) ? m[0]! : '')
       .replaceAll(RegExp("ה['׳](?=[\\s,.:;]|\$)"), 'יהוה')
       .replaceAll('־', ' ')
       .replaceAll(RegExp('[֑-ֽֿ֯׀׃-׆]'), '');
