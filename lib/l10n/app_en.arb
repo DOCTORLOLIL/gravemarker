@@ -197,5 +197,8 @@
  "azNavigate": "Navigate to the grave",
  "azCalendar": "Add to calendar",
  "azForward": "Forward to more family",
- "azPast": "This memorial has already taken place"
+ "azPast": "This memorial has already taken place",
+ "shabbatMsg": "Out of respect for the departed, we keep Shabbat.\nTry it too.",
+ "shabbatBack": "We'll be back after Shabbat, at {time} (Israel time).",
+ "shabbatShalom": "Shabbat Shalom"
 }

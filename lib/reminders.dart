@@ -11,6 +11,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'data.dart';
 import 'hebcal.dart';
 import 'l10n/app_localizations.dart';
+import 'shabbat.dart';
 
 /// תזכורות ליום השנה: שבוע לפני, ובצהרי היום שבערבו מתחיל יום השנה
 class Reminders {
@@ -79,7 +80,8 @@ class Reminders {
     final t = lookupAppLocalizations(Locale(lang));
     final now = tz.TZDateTime.now(tz.UTC);
     // שעה מקומית בטלפון → UTC
-    tz.TZDateTime at0(DateTime d, int h) => tz.TZDateTime.from(DateTime(d.year, d.month, d.day, h), tz.UTC);
+    tz.TZDateTime at0(DateTime d, int h) =>
+        tz.TZDateTime.from(Shabbat.avoid(DateTime(d.year, d.month, d.day, h).toUtc()), tz.UTC);
     final details = NotificationDetails(
       android: AndroidNotificationDetails('yahrzeit', t.notifChannel,
           channelDescription: t.notifChannelDesc, importance: Importance.high),

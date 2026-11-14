@@ -334,5 +334,13 @@
   "placeholders": {
    "name": {}
   }
+ },
+ "shabbatMsg": "לכבוד הנפטרים, אנחנו שומרים שבת.\nנסו גם אתם.",
+ "shabbatBack": "נחזור במוצאי שבת, בשעה {time}.",
+ "shabbatShalom": "שבת שלום",
+ "@shabbatBack": {
+  "placeholders": {
+   "time": {}
+  }
  }
 }

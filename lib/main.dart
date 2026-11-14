@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:app_links/app_links.dart';
@@ -13,6 +14,7 @@ import 'reminders.dart';
 import 'routes.dart';
 import 'screens/azkara.dart';
 import 'screens/route.dart';
+import 'shabbat.dart';
 import 'stats.dart';
 import 'screens/detail.dart';
 import 'screens/search.dart';
@@ -62,9 +64,22 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
     nav.push(MaterialPageRoute(builder: (_) => RouteScreen(route: r)));
   }
 
+  DateTime? _shabbatEnd = Shabbat.end();
+  Timer? _shabbatTimer;
+
+  @override
+  void dispose() {
+    _shabbatTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+    _shabbatTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      final e = Shabbat.end();
+      if (e != _shabbatEnd) setState(() => _shabbatEnd = e);
+    });
     Reminders.onOpen = _open;
     // קישור למסלול ששותף (gravemarker.bulu.ltd/r/...)
     final links = AppLinks();
@@ -112,6 +127,43 @@ class _GraveMarkerAppState extends State<GraveMarkerApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       home: widget.showWelcome ? const WelcomeScreen() : const SearchScreen(),
+      // בשבת: מסך שבת מעל כל האפליקציה
+      builder: (context, child) => Stack(children: [
+        if (child != null) child,
+        if (_shabbatEnd != null) ShabbatScreen(until: _shabbatEnd!),
+      ]),
     ));
+  }
+}
+
+
+class ShabbatScreen extends StatelessWidget {
+  final DateTime until;
+  const ShabbatScreen({super.key, required this.until});
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return Material(
+      color: teal,
+      child: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Text('🕯️🕯️', style: TextStyle(fontSize: 56)),
+              const SizedBox(height: 14),
+              Text(t.shabbatMsg,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, height: 1.4)),
+              const SizedBox(height: 18),
+              Text(t.shabbatBack(Shabbat.hhmm(until)),
+                  textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 16)),
+              const SizedBox(height: 28),
+              Text(t.shabbatShalom, style: const TextStyle(color: Colors.white60, fontSize: 14)),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 }

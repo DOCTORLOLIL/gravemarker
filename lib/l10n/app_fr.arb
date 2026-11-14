@@ -192,5 +192,8 @@
  "azNavigate": "Naviguer jusqu'à la tombe",
  "azCalendar": "Ajouter au calendrier",
  "azForward": "Transférer à d'autres proches",
- "azPast": "Cette Hazkara a déjà eu lieu"
+ "azPast": "Cette Hazkara a déjà eu lieu",
+ "shabbatMsg": "Par respect pour les défunts, nous respectons le Chabbat.\nEssayez vous aussi.",
+ "shabbatBack": "Nous serons de retour à la sortie du Chabbat, à {time} (heure d'Israël).",
+ "shabbatShalom": "Chabbat Chalom"
 }
