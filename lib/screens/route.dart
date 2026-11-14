@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../data.dart';
 import '../l10n/app_localizations.dart';
+import '../places.dart';
 import '../routes.dart';
 import 'actions.dart';
 import 'detail.dart';
@@ -51,7 +52,11 @@ class _RouteScreenState extends State<RouteScreen> {
           final p = await Geolocator.getLastKnownPosition();
           if (p != null) start = LatLng(p.latitude, p.longitude);
         } catch (_) {}
-        if (start == null || _cem?.center == null || _distance(start, _cem!.center!) > 1500) start = _cem?.center;
+        if (start == null || _cem?.center == null || _distance(start, _cem!.center!) > 1500) {
+          // לא בבית העלמין: מתחילים מהכניסה (אם סומנה), אחרת ממרכז בית העלמין
+          final ent = (await Places.of(r.cem)).where((p) => p.kind == 'entrance').firstOrNull;
+          start = ent?.pos ?? _cem?.center;
+        }
         r.ids = shortestOrder(r.ids, _pos, start);
       }
       await RouteStore.put(r);

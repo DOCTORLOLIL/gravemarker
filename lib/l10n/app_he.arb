@@ -350,5 +350,35 @@
   "placeholders": {
    "time": {}
   }
+ },
+ "infoTitle": "מידע שימושי",
+ "hours": "שעות פתיחה",
+ "noPlaces": "עוד לא סומנו נקודות שימושיות בבית העלמין הזה.",
+ "placeWash": "ברזייה לנטילת ידיים",
+ "placeTap": "ברז לשטיפת קבר",
+ "placeWc": "שירותים",
+ "placeParking": "חניה",
+ "placeEntrance": "כניסה",
+ "placeOffice": "משרד",
+ "placeShade": "צל וספסל",
+ "metersFromYou": "{m} מ' ממך",
+ "nearestWash": "נטילת ידיים: {m} מ' מהקבר",
+ "nearestTap": "ברז לשטיפת הקבר: {m} מ' מהקבר",
+ "navigateShort": "ניווט",
+ "azNavEntrance": "ניווט לכניסה",
+ "@metersFromYou": {
+  "placeholders": {
+   "m": {}
+  }
+ },
+ "@nearestWash": {
+  "placeholders": {
+   "m": {}
+  }
+ },
+ "@nearestTap": {
+  "placeholders": {
+   "m": {}
+  }
  }
 }

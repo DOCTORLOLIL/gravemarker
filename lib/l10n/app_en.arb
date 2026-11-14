@@ -203,5 +203,20 @@
  "shabbatShalom": "Shabbat Shalom",
  "chagMsg": "Out of respect for the departed, we keep the holiday.\nTry it too.",
  "chagBack": "We'll be back after the holiday, at {time} (Israel time).",
- "chagSameach": "Chag Sameach"
+ "chagSameach": "Chag Sameach",
+ "infoTitle": "Useful info",
+ "hours": "Opening hours",
+ "noPlaces": "No useful places have been marked in this cemetery yet.",
+ "placeWash": "Hand-washing station",
+ "placeTap": "Tap for washing the grave",
+ "placeWc": "Restrooms",
+ "placeParking": "Parking",
+ "placeEntrance": "Entrance",
+ "placeOffice": "Office",
+ "placeShade": "Shade and bench",
+ "metersFromYou": "{m} m from you",
+ "nearestWash": "Hand washing: {m} m from the grave",
+ "nearestTap": "Tap for washing the grave: {m} m from the grave",
+ "navigateShort": "Navigate",
+ "azNavEntrance": "Navigate to the entrance"
 }

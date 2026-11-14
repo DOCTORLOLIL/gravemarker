@@ -198,5 +198,20 @@
  "shabbatShalom": "ሻባት ሻሎም",
  "chagMsg": "ለሟቾች ክብር በዓሉን እንጠብቃለን።\nእርስዎም ይሞክሩ።",
  "chagBack": "በዓሉ ሲያበቃ በ{time} (የእስራኤል ሰዓት) እንመለሳለን።",
- "chagSameach": "መልካም በዓል"
+ "chagSameach": "መልካም በዓል",
+ "infoTitle": "ጠቃሚ መረጃ",
+ "hours": "የመክፈቻ ሰዓታት",
+ "noPlaces": "በዚህ የመቃብር ቦታ እስካሁን ጠቃሚ ቦታዎች አልተመዘገቡም።",
+ "placeWash": "የእጅ መታጠቢያ",
+ "placeTap": "መቃብር ማጠቢያ ቧንቧ",
+ "placeWc": "መጸዳጃ ቤት",
+ "placeParking": "የመኪና ማቆሚያ",
+ "placeEntrance": "መግቢያ",
+ "placeOffice": "ቢሮ",
+ "placeShade": "ጥላ እና አግዳሚ ወንበር",
+ "metersFromYou": "ከእርስዎ {m} ሜ",
+ "nearestWash": "የእጅ መታጠቢያ፦ ከመቃብሩ {m} ሜ",
+ "nearestTap": "መቃብር ማጠቢያ ቧንቧ፦ ከመቃብሩ {m} ሜ",
+ "navigateShort": "ምራ",
+ "azNavEntrance": "ወደ መግቢያው ምራ"
 }

@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../data.dart';
 import '../hebcal.dart';
+import '../places.dart';
 import '../l10n/app_localizations.dart';
 import 'detail.dart';
 import 'search.dart';
@@ -309,10 +310,22 @@ class AzkaraInviteScreen extends StatelessWidget {
         const SizedBox(height: 10),
         FilledButton.icon(
           style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-          onPressed: () =>
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailScreen(deceased: d, cemetery: cemetery))),
+          onPressed: () async {
+            if (!azkara.atGrave) {
+              final ent = (await Places.of(cemetery.id)).where((p) => p.kind == 'entrance').firstOrNull;
+              if (ent != null) {
+                launchUrl(
+                    Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${ent.pos.latitude},${ent.pos.longitude}'),
+                    mode: LaunchMode.externalApplication);
+                return;
+              }
+            }
+            if (context.mounted) {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailScreen(deceased: d, cemetery: cemetery)));
+            }
+          },
           icon: const Icon(Icons.explore),
-          label: Text(t.azNavigate, style: const TextStyle(fontSize: 16)),
+          label: Text(azkara.atGrave ? t.azNavigate : t.azNavEntrance, style: const TextStyle(fontSize: 16)),
         ),
         const SizedBox(height: 8),
         Row(children: [

@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../offline.dart';
 import '../lang.dart';
 import '../routes.dart';
+import 'info.dart';
 import 'route.dart';
 import '../update.dart';
 import '../stats.dart';
@@ -270,6 +271,17 @@ class _SearchScreenState extends State<SearchScreen> {
           if (_cem != null)
             ListTile(leading: const Icon(Icons.contacts_outlined), title: Text(t.contacts), onTap: () => go(ContactsScreen(cemetery: _cem!))),
           ListTile(leading: const Icon(Icons.auto_stories_outlined), title: Text(t.blessingLink), onTap: () => go(const WelcomeScreen(popOnly: true))),
+          if (_cem != null)
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: Text(t.infoTitle),
+              onTap: () {
+                final c = _cem!;
+                Navigator.of(context)
+                  ..pop()
+                  ..push(MaterialPageRoute(builder: (_) => InfoScreen(cemetery: c)));
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.star_outline),
             title: Text(t.routeTitle),

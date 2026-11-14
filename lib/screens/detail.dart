@@ -16,6 +16,7 @@ import '../geo.dart';
 import '../hebcal.dart';
 import '../l10n/app_localizations.dart';
 import '../offline.dart';
+import '../places.dart';
 import '../reminders.dart';
 import '../routes.dart';
 import 'actions.dart';
@@ -44,6 +45,7 @@ class _DetailScreenState extends State<DetailScreen> {
   double? _heading, _meAcc;
   List<String> _photos = [];
   File? _overlayFile;
+  List<Place> _places = [];
   bool _remind = false, _inVisit = false, _arrivalShown = false;
   bool _locDenied = false, _asked = true, _saving = false;
   String? _saveCountdown;
@@ -70,6 +72,9 @@ class _DetailScreenState extends State<DetailScreen> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     _asked = prefs.getBool('asked:${d.id}') ?? false;
+    Places.of(cem.id).then((p) {
+      if (mounted) setState(() => _places = p);
+    });
     Offline.overlay(cem.id).then((f) {
       if (f != null && mounted) setState(() => _overlayFile = f);
     });
@@ -371,6 +376,24 @@ class _DetailScreenState extends State<DetailScreen> {
                   PolylineLayer(polylines: [
                     Polyline(points: [_me!, _target!], color: const Color(0xFF1F8FFF), strokeWidth: 3),
                   ]),
+                if (_places.isNotEmpty)
+                  MarkerLayer(markers: [
+                    for (final p in _places)
+                      Marker(
+                        point: p.pos,
+                        width: 30,
+                        height: 30,
+                        child: Tooltip(
+                          message: p.label(t),
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(blurRadius: 3, color: Colors.black45)]),
+                            alignment: Alignment.center,
+                            child: Text(p.icon, style: const TextStyle(fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                  ]),
                 CircleLayer(circles: [
                   if (_grave != null)
                     CircleMarker(point: _grave!, radius: 9, color: graveRed, borderColor: Colors.white, borderStrokeWidth: 3)
@@ -412,6 +435,10 @@ class _DetailScreenState extends State<DetailScreen> {
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 2),
                   Text(subLine(t, d), style: TextStyle(color: cs.onSurfaceVariant)),
+                  if (_target != null)
+                    for (final (kind, fmt) in [('wash', t.nearestWash), ('tap', t.nearestTap)])
+                      if (Places.nearest(_places, kind, _target!) case final n?)
+                        Text('${n.$1.icon} ${fmt('${roundMeters(n.$2)}')}', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
                   const SizedBox(height: 10),
                   Row(children: [
                     for (final (label, val) in [(t.plot, d.plot), (t.row, d.row), (t.grave, d.grave)])
