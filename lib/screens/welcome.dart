@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
+import '../translit.dart';
 import 'search.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -41,8 +42,21 @@ class WelcomeScreen extends StatelessWidget {
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(20),
-                      child: Text(t.blessing,
-                          textAlign: TextAlign.justify, style: const TextStyle(fontSize: 20, height: 1.9)),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                        Text(t.blessing,
+                            textDirection: TextDirection.rtl,
+                            textAlign: TextAlign.justify,
+                            style: const TextStyle(fontSize: 20, height: 1.9)),
+                        // מי שהאפליקציה שלו לא בעברית – מקבל גם תעתיק
+                        if (Localizations.localeOf(context).languageCode != 'he') ...[
+                          const Divider(height: 24),
+                          Text(
+                            translit(t.blessing, Localizations.localeOf(context).languageCode == 'ru' ? 'cyr' : 'lat'),
+                            textDirection: TextDirection.ltr,
+                            style: TextStyle(fontSize: 16, height: 1.6, color: mute),
+                          ),
+                        ],
+                      ]),
                     ),
                   ),
                   const SizedBox(height: 10),
