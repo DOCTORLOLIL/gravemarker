@@ -19,6 +19,7 @@ import '../offline.dart';
 import '../reminders.dart';
 import '../routes.dart';
 import 'actions.dart';
+import 'azkara.dart';
 import 'route.dart';
 import 'search.dart';
 
@@ -471,18 +472,28 @@ class _DetailScreenState extends State<DetailScreen> {
                     Text(t.startsEve(dows[yz.date.weekday % 7], dmy(yz.date)),
                         style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
                     const SizedBox(height: 6),
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: _remind
-                          ? FilledButton.tonalIcon(
-                              onPressed: _toggleRemind,
-                              icon: const Icon(Icons.notifications_active),
-                              label: Text(t.remindIsOn))
-                          : OutlinedButton.icon(
-                              onPressed: _toggleRemind,
-                              icon: const Icon(Icons.notifications_none),
-                              label: Text(t.remindSet)),
-                    ),
+                    Row(children: [
+                      Expanded(
+                        child: _remind
+                            ? FilledButton.tonalIcon(
+                                onPressed: _toggleRemind,
+                                icon: const Icon(Icons.notifications_active),
+                                label: Text(t.remindIsOn))
+                            : OutlinedButton.icon(
+                                onPressed: _toggleRemind,
+                                icon: const Icon(Icons.notifications_none),
+                                label: Text(t.remindSet)),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => AzkaraFormScreen(deceased: d, cemetery: cem, yahrzeit: yz.date))),
+                          icon: const Text('🕯️'),
+                          label: Text(t.azTitle),
+                        ),
+                      ),
+                    ]),
                   ],
                   const SizedBox(height: 12),
                   Row(children: [

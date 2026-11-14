@@ -11,6 +11,7 @@ import 'l10n/app_localizations.dart';
 import 'lang.dart';
 import 'reminders.dart';
 import 'routes.dart';
+import 'screens/azkara.dart';
 import 'screens/route.dart';
 import 'stats.dart';
 import 'screens/detail.dart';
@@ -51,9 +52,12 @@ class GraveMarkerApp extends StatefulWidget {
 
 class _GraveMarkerAppState extends State<GraveMarkerApp> {
   Future<void> _openRoute(Uri u) async {
-    final r = VisitRoute.fromUri(u);
     final nav = navKey.currentState;
-    if (r == null || nav == null) return;
+    if (nav == null) return;
+    final a = Azkara.fromUri(u);
+    if (a != null) return AzkaraInviteScreen.open(nav, a);
+    final r = VisitRoute.fromUri(u);
+    if (r == null) return;
     await RouteStore.setActive(r);
     nav.push(MaterialPageRoute(builder: (_) => RouteScreen(route: r)));
   }

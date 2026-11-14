@@ -32,6 +32,7 @@ if 'android:pathPrefix="/r"' not in s:
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="https" android:host="gravemarker.bulu.ltd" android:pathPrefix="/r"/>
+                <data android:scheme="https" android:host="gravemarker.bulu.ltd" android:pathPrefix="/a"/>
             </intent-filter>
         </activity>''', 1)
 if 'android:scheme="mailto"' not in s:

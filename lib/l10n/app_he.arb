@@ -302,5 +302,37 @@
    "cem": {},
    "name": {}
   }
+ },
+ "azTitle": "תיאום אזכרה",
+ "azFor": "לעילוי נשמת {name} ז\"ל",
+ "azDate": "תאריך",
+ "azYahrzeit": "יום השנה",
+ "azFriBefore": "יום ו' שלפני",
+ "azSunAfter": "יום א' שאחרי",
+ "azOtherDate": "תאריך אחר",
+ "azShabbat": "היום שנבחר הוא שבת. בחרו יום אחר.",
+ "azTime": "שעה",
+ "azPlace": "מקום מפגש",
+ "azAtGrave": "ליד הקבר",
+ "azAtEntrance": "בכניסה לבית העלמין",
+ "azNote": "הערה (לא חובה)",
+ "azNoteHint": "למשל: מניין לקדיש, אחר כך סעודה",
+ "azSendWa": "שליחה בוואטסאפ",
+ "azSendOther": "מייל ואפשרויות נוספות",
+ "azPreview": "תצוגה של ההזמנה",
+ "azInviteTitle": "אזכרה ל{name} ז\"ל",
+ "azNavigate": "ניווט עד הקבר",
+ "azCalendar": "הוספה ליומן",
+ "azForward": "העברה לבני משפחה נוספים",
+ "azPast": "האזכרה כבר התקיימה",
+ "@azFor": {
+  "placeholders": {
+   "name": {}
+  }
+ },
+ "@azInviteTitle": {
+  "placeholders": {
+   "name": {}
+  }
  }
 }
