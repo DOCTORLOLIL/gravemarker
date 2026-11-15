@@ -283,6 +283,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   ..push(MaterialPageRoute(builder: (_) => InfoScreen(cemetery: c)));
               },
             ),
+          if (_cem != null)
+            ListTile(
+              leading: const Text('🕯️', style: TextStyle(fontSize: 20)),
+              title: Text(t.tzaddikim),
+              onTap: () {
+                final c = _cem!;
+                Navigator.of(context)
+                  ..pop()
+                  ..push(MaterialPageRoute(
+                      builder: (_) => WebPageScreen(title: t.tzaddikim, url: '$webBase/tz/?c=${Uri.encodeComponent(c.id)}')));
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.star_outline),
             title: Text(t.routeTitle),
