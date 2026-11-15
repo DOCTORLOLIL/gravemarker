@@ -7,6 +7,7 @@ import '../hebcal.dart';
 import '../places.dart';
 import '../l10n/app_localizations.dart';
 import 'detail.dart';
+import 'webpage.dart';
 import 'search.dart';
 
 /// פרטי אזכרה – נשמרים כולם בתוך הקישור
@@ -341,7 +342,7 @@ class AzkaraInviteScreen extends StatelessWidget {
                   'p': d.mother ?? d.father ?? '',
                   't': (d.mother ?? '').isNotEmpty ? 'm' : 'f',
                 }).query;
-                launchUrl(Uri.parse('$webBase/tefilon/?$q'), mode: LaunchMode.inAppBrowserView);
+                WebPageScreen.open(context, t.tefilon, '$webBase/tefilon/?$q');
               },
               icon: const Icon(Icons.menu_book_outlined),
               label: Text(t.tefilon),

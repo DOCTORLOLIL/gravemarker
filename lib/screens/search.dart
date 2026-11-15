@@ -9,6 +9,7 @@ import '../lang.dart';
 import '../routes.dart';
 import 'info.dart';
 import 'route.dart';
+import 'webpage.dart';
 import '../update.dart';
 import '../stats.dart';
 import 'contacts.dart';
@@ -301,8 +302,22 @@ class _SearchScreenState extends State<SearchScreen> {
                 ..push(MaterialPageRoute(builder: (_) => const MyRoutesScreen()));
             },
           ),
-          ListTile(leading: const Icon(Icons.menu_book_outlined), title: Text(t.tefilon), onTap: () => web('$webBase/tefilon/')),
-          ListTile(leading: const Icon(Icons.local_florist_outlined), title: Text(t.ashkava), onTap: () => web('$webBase/ashkava/')),
+          ListTile(
+              leading: const Icon(Icons.menu_book_outlined),
+              title: Text(t.tefilon),
+              onTap: () {
+                Navigator.of(context)
+                  ..pop()
+                  ..push(MaterialPageRoute(builder: (_) => WebPageScreen(title: t.tefilon, url: '$webBase/tefilon/')));
+              }),
+          ListTile(
+              leading: const Icon(Icons.local_florist_outlined),
+              title: Text(t.ashkava),
+              onTap: () {
+                Navigator.of(context)
+                  ..pop()
+                  ..push(MaterialPageRoute(builder: (_) => WebPageScreen(title: t.ashkava, url: '$webBase/ashkava/')));
+              }),
           ListTile(leading: const Icon(Icons.language), title: Text(t.website), onTap: () => web(webBase)),
           const Divider(),
           ListTile(leading: const Icon(Icons.edit_location_alt_outlined), title: Text(t.editors), onTap: () {

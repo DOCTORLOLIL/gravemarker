@@ -22,6 +22,7 @@ import '../routes.dart';
 import 'actions.dart';
 import 'azkara.dart';
 import 'route.dart';
+import 'webpage.dart';
 import 'search.dart';
 
 const graveRed = Color(0xFFDC1E1E);
@@ -312,12 +313,12 @@ class _DetailScreenState extends State<DetailScreen> {
       'p': d.mother ?? d.father ?? '',
       't': (d.mother ?? '').isNotEmpty ? 'm' : 'f',
     }).query;
-    launchUrl(Uri.parse('$webBase/tefilon/?$q'), mode: LaunchMode.inAppBrowserView);
+    WebPageScreen.open(context, AppLocalizations.of(context).tefilon, '$webBase/tefilon/?$q');
   }
 
   void _ashkava() {
     final q = Uri(queryParameters: {'n': d.firstName ?? '', 'p': d.father ?? d.mother ?? ''}).query;
-    launchUrl(Uri.parse('$webBase/ashkava/?$q'), mode: LaunchMode.inAppBrowserView);
+    WebPageScreen.open(context, AppLocalizations.of(context).ashkava, '$webBase/ashkava/?$q');
   }
 
   @override
