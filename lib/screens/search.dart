@@ -285,6 +285,18 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           if (_cem != null)
             ListTile(
+              leading: const Icon(Icons.event_note_outlined),
+              title: Text(t.yahrzeitSoon),
+              onTap: () {
+                final c = _cem!;
+                Navigator.of(context)
+                  ..pop()
+                  ..push(MaterialPageRoute(
+                      builder: (_) => WebPageScreen(title: t.yahrzeitSoon, url: '$webBase/yz/?c=${Uri.encodeComponent(c.id)}')));
+              },
+            ),
+          if (_cem != null)
+            ListTile(
               leading: const Text('🕯️', style: TextStyle(fontSize: 20)),
               title: Text(t.tzaddikim),
               onTap: () {
