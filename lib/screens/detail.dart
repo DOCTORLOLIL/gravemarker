@@ -21,6 +21,7 @@ import '../reminders.dart';
 import '../routes.dart';
 import 'actions.dart';
 import 'azkara.dart';
+import 'family.dart';
 import 'route.dart';
 import 'webpage.dart';
 import 'search.dart';
@@ -545,6 +546,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           icon: const Icon(Icons.star_border),
                           label: Text(t.routeAdd, style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
+                  FamilyButton(deceased: d),
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
                     onPressed: _photo,

@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'data.dart';
 import 'l10n/app_localizations.dart';
 import 'lang.dart';
+import 'family.dart';
 import 'reminders.dart';
 import 'routes.dart';
 import 'screens/azkara.dart';
@@ -31,6 +32,8 @@ Future<void> main() async {
     await Reminders.init();
     Reminders.reschedule();
   } catch (_) {}
+  // "המשפחה שלי" (בטא): בדיקת רקע + בדיקה עכשיו
+  Family.start().then((_) => Family.check()).catchError((_) {});
   runApp(GraveMarkerApp(showWelcome: showWelcome));
   // ספירת התקנה כבר בפתיחה, גם אם המשתמש עוד במסך הפתיחה
   pingInstall(appLang.value ?? PlatformDispatcher.instance.locale.languageCode);

@@ -48,6 +48,21 @@ class Reminders {
     return s == null ? [] : List<Map<String, dynamic>>.from(jsonDecode(s));
   }
 
+  static Future<bool> askPermission() async {
+    await init();
+    return await _n.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission() ?? true;
+  }
+
+  /// התראה מיידית (אירועים של "המשפחה שלי")
+  static Future<void> showNow(int nid, String title, String body, String payload) async {
+    await init();
+    await _n.show(nid, title, body,
+        NotificationDetails(
+            android: AndroidNotificationDetails('family', 'המשפחה שלי',
+                importance: Importance.high, styleInformation: BigTextStyleInformation(body))),
+        payload: payload);
+  }
+
   static Future<bool> isOn(int id) async => (await _list()).any((x) => x['id'] == id);
 
   /// הפעלה/כיבוי. מחזיר את המצב החדש, או null אם אין הרשאה להתראות
@@ -86,7 +101,15 @@ class Reminders {
       android: AndroidNotificationDetails('yahrzeit', t.notifChannel,
           channelDescription: t.notifChannelDesc, importance: Importance.high),
     );
-    for (final r in await _list()) {
+    final all = [...await _list()];
+    // נפטרים מ"המשפחה שלי" – גם להם תזכורת יארצייט (אם לא כובה)
+    if ((prefs.getBool('famBeta') ?? false) && (prefs.getBool('fam_yz') ?? true)) {
+      final fl = prefs.getString('famList');
+      for (final f in fl == null ? const [] : List<Map<String, dynamic>>.from(jsonDecode(fl))) {
+        if (!all.any((x) => x['id'] == f['id'])) all.add(f);
+      }
+    }
+    for (final r in all) {
       final death = DateTime.tryParse(r['death'] ?? '');
       if (death == null) continue;
       final id = r['id'] as int, name = r['name'] ?? '';

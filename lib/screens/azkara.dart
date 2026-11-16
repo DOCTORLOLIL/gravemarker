@@ -3,6 +3,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../data.dart';
+import '../family.dart';
 import '../hebcal.dart';
 import '../places.dart';
 import '../l10n/app_localizations.dart';
@@ -109,6 +110,20 @@ class _AzkaraFormScreenState extends State<AzkaraFormScreen> {
   TimeOfDay _time = const TimeOfDay(hour: 16, minute: 0);
   bool _atGrave = true;
   final _note = TextEditingController();
+  bool _beta = false, _toFamily = true;
+  int _famCount = 0;
+
+  /// שולח גם לכל המקושרים ב"המשפחה שלי" (בטא)
+  Future<void> _notifyFamily(AppLocalizations t) async {
+    if (!_beta || !_toFamily || _famCount == 0) return;
+    final m = ScaffoldMessenger.of(context);
+    try {
+      final n = await Family.sendAzkara(widget.deceased.id, inviteText(t, _az, widget.deceased, widget.cemetery));
+      m.showSnackBar(SnackBar(content: Text('נשלחה התראה ל-$n מקושרים')));
+    } catch (_) {
+      m.showSnackBar(const SnackBar(content: Text('ההתראה למשפחה לא נשלחה. נסו שוב.')));
+    }
+  }
 
   DateTime get _yz => DateTime(widget.yahrzeit.year, widget.yahrzeit.month, widget.yahrzeit.day);
 
@@ -129,6 +144,14 @@ class _AzkaraFormScreenState extends State<AzkaraFormScreen> {
     super.initState();
     final yz = _yz;
     _day = yz.weekday == DateTime.saturday ? yz.subtract(const Duration(days: 1)) : yz;
+    () async {
+      if (!await Family.enabled()) return;
+      final c = await Family.count(widget.deceased.id);
+      if (mounted) setState(() {
+        _beta = true;
+        _famCount = c;
+      });
+    }();
   }
 
   Azkara get _az => Azkara(widget.cemetery.id, widget.deceased.id,
@@ -213,11 +236,20 @@ class _AzkaraFormScreenState extends State<AzkaraFormScreen> {
           maxLines: 2,
           decoration: InputDecoration(labelText: t.azNote, hintText: t.azNoteHint, border: const OutlineInputBorder()),
         ),
+        if (_beta && _famCount > 0)
+          CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            value: _toFamily,
+            onChanged: (v) => setState(() => _toFamily = v ?? false),
+            title: const Text('לשלוח לכל המשפחה המקושרת', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('$_famCount מקושרים יקבלו התראה עם כל הפרטים'),
+          ),
         const SizedBox(height: 6),
         FilledButton.icon(
           style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFF25D366), padding: const EdgeInsets.symmetric(vertical: 14)),
           onPressed: _day.weekday == DateTime.saturday ? null : () {
+            _notifyFamily(t);
             final text = inviteText(t, _az, d, widget.cemetery);
             launchUrl(Uri.parse('https://wa.me/?text=${Uri.encodeComponent(text)}'), mode: LaunchMode.externalApplication);
           },
@@ -228,7 +260,10 @@ class _AzkaraFormScreenState extends State<AzkaraFormScreen> {
         OutlinedButton.icon(
           onPressed: _day.weekday == DateTime.saturday
               ? null
-              : () => shareInvite(context, inviteText(t, _az, d, widget.cemetery), t.azInviteTitle(d.fullName)),
+              : () {
+                  _notifyFamily(t);
+                  shareInvite(context, inviteText(t, _az, d, widget.cemetery), t.azInviteTitle(d.fullName));
+                },
           icon: const Icon(Icons.share_outlined),
           label: Text(t.azSendOther),
         ),

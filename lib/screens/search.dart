@@ -14,6 +14,8 @@ import '../update.dart';
 import '../stats.dart';
 import 'contacts.dart';
 import 'detail.dart';
+import 'family.dart';
+import '../family.dart';
 import 'welcome.dart';
 
 String dmy(DateTime d) =>
@@ -46,7 +48,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Cemetery? _cem;
   List<Deceased>? _res;
   String? _msg;
-  bool _busy = false;
+  bool _busy = false, _famBeta = false;
   DateTime? _savedAt;
   int? _saveN;
   (int, String)? _update; // מספר הרשומות שנשמרו עד כה (בזמן שמירה)
@@ -128,6 +130,9 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _load();
+    Family.enabled().then((v) {
+      if (mounted && v) setState(() => _famBeta = true);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) pingInstall(Localizations.localeOf(context).languageCode);
     });
@@ -307,6 +312,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       builder: (_) => WebPageScreen(title: t.tzaddikim, url: '$webBase/tz/?c=${Uri.encodeComponent(c.id)}')));
               },
             ),
+          if (_famBeta)
+            ListTile(
+              leading: const Icon(Icons.family_restroom),
+              title: const Text('המשפחה שלי (בטא)'),
+              onTap: () => go(const FamilyScreen()),
+            ),
           ListTile(
             leading: const Icon(Icons.star_outline),
             title: Text(t.routeTitle),
@@ -370,6 +381,13 @@ class _SearchScreenState extends State<SearchScreen> {
               leading: const Icon(Icons.system_update_outlined),
               title: Text(t.version('$appBuild')),
               onTap: () => web('$webBase/download/'),
+              // לחיצה ארוכה: הפעלה/כיבוי של "המשפחה שלי" (בטא, לבדיקה בלבד)
+              onLongPress: () async {
+                final m = ScaffoldMessenger.of(context);
+                final v = await Family.toggleBeta();
+                setState(() => _famBeta = v);
+                m.showSnackBar(SnackBar(content: Text(v ? 'בטא "המשפחה שלי" הופעלה' : 'בטא "המשפחה שלי" כובתה')));
+              },
             ),
         ]),
       ),
