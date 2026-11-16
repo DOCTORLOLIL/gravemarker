@@ -32,7 +32,7 @@ class _WebPageScreenState extends State<WebPageScreen> {
         // קישורים לאתרים אחרים נפתחים בדפדפן
         onNavigationRequest: (r) {
           final u = Uri.tryParse(r.url);
-          if (u != null && u.host.isNotEmpty && u.host != home) {
+          if (r.isMainFrame && u != null && u.host.isNotEmpty && u.host != home) {
             launchUrl(u, mode: LaunchMode.externalApplication);
             return NavigationDecision.prevent;
           }

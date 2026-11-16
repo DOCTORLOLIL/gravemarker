@@ -29,7 +29,7 @@ class Azkara {
       }).query}';
 
   static Azkara? fromUri(Uri u) {
-    if (!u.path.startsWith('/a')) return null;
+    if (u.path != '/a' && u.path != '/a/') return null;
     final id = int.tryParse(u.queryParameters['d'] ?? ''), cem = u.queryParameters['c'];
     final when = DateTime.tryParse(u.queryParameters['t'] ?? '');
     if (id == null || cem == null || when == null) return null;

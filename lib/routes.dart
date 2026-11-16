@@ -35,7 +35,7 @@ class VisitRoute {
       '$webBase/r/?${Uri(queryParameters: {'c': cem, 'ids': ids.join(','), 'n': name}).query}';
 
   static VisitRoute? fromUri(Uri u) {
-    if (!u.path.startsWith('/r')) return null;
+    if (u.path != '/r' && u.path != '/r/') return null;
     final ids = (u.queryParameters['ids'] ?? '').split(',').map(int.tryParse).whereType<int>().toList();
     final cem = u.queryParameters['c'];
     if (ids.isEmpty || cem == null) return null;
