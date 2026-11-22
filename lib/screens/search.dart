@@ -288,6 +288,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   ..push(MaterialPageRoute(builder: (_) => InfoScreen(cemetery: c)));
               },
             ),
+          ListTile(
+            leading: const Icon(Icons.menu_book_outlined),
+            title: Text(t.avelut),
+            onTap: () => Navigator.of(context)
+              ..pop()
+              ..push(MaterialPageRoute(builder: (_) => WebPageScreen(title: t.avelut, url: '$webBase/avelut/'))),
+          ),
           if (_cem != null)
             ListTile(
               leading: const Icon(Icons.event_note_outlined),
