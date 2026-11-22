@@ -56,32 +56,44 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         Card(
                           child: Padding(
                             padding: const EdgeInsets.all(12),
-                            child: Row(children: [
-                              Expanded(
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  Text(c['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                  if ((c['role'] ?? '').toString().isNotEmpty)
-                                    Text(c['role'], style: TextStyle(color: cs.onSurfaceVariant)),
-                                  if ((c['notes'] ?? '').toString().isNotEmpty)
-                                    Text(c['notes'], style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
-                                ]),
-                              ),
-                              if ((c['phone'] ?? '').toString().isNotEmpty)
-                                FilledButton(
-                                  onPressed: () => launchUrl(Uri.parse('tel:${c['phone'].toString().replaceAll(RegExp(r'[^\d+]'), '')}')),
-                                  child: Text(t.call),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(c['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              if ((c['role'] ?? '').toString().isNotEmpty)
+                                Text(c['role'], style: TextStyle(color: cs.onSurfaceVariant)),
+                              if ((c['notes'] ?? '').toString().isNotEmpty)
+                                Text(c['notes'], style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
+                              const SizedBox(height: 8),
+                              Wrap(spacing: 6, runSpacing: 6, children: [
+                                if ((c['phone'] ?? '').toString().isNotEmpty)
+                                  FilledButton(
+                                    onPressed: () => launchUrl(Uri.parse('tel:${c['phone'].toString().replaceAll(RegExp(r'[^\d+]'), '')}')),
+                                    child: Text(t.call),
+                                  ),
+                                if (_wa(c['phone']) != null)
+                                  FilledButton.tonal(
+                                    onPressed: () => launchUrl(Uri.parse(_wa(c['phone'])!), mode: LaunchMode.externalApplication),
+                                    child: Text(t.whatsapp),
+                                  ),
+                                // "לאתר": כהה כשעוד אין כתובת
+                                OutlinedButton.icon(
+                                  onPressed: (c['website'] ?? '').toString().isEmpty
+                                      ? null
+                                      : () => launchUrl(Uri.parse(c['website']), mode: LaunchMode.externalApplication),
+                                  icon: const Icon(Icons.language, size: 18),
+                                  label: Text(t.toWebsite),
                                 ),
-                              if (_wa(c['phone']) != null) ...[
-                                const SizedBox(width: 6),
-                                FilledButton.tonal(
-                                  onPressed: () => launchUrl(Uri.parse(_wa(c['phone'])!), mode: LaunchMode.externalApplication),
-                                  child: Text(t.whatsapp),
-                                ),
-                              ],
+                              ]),
                             ]),
                           ),
                         ),
                     ],
+                  const SizedBox(height: 16),
+                  Center(
+                    child: TextButton(
+                      onPressed: () => launchUrl(Uri.parse('mailto:ceo@bulu.ltd?subject=${Uri.encodeComponent('${t.advertiseHere} – ${widget.cemetery.name}')}')),
+                      child: Text('${t.advertiseHere}: ceo@bulu.ltd', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+                    ),
+                  ),
                 ]),
     );
   }
