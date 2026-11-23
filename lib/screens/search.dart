@@ -34,7 +34,7 @@ String subLine(AppLocalizations t, Deceased d) {
 }
 
 String locLine(AppLocalizations t, Deceased d) =>
-    d.plot == null ? t.locUnknown : t.locLine(d.plot!, d.row ?? '—', d.grave ?? '—');
+    d.plot == null ? t.locUnknown : '${d.gush != null ? '${t.gush} ${d.gush} · ' : ''}${t.locLine(d.plot!, d.row ?? '—', d.grave ?? '—')}';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

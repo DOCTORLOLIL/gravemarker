@@ -141,7 +141,7 @@ class _DetailScreenState extends State<DetailScreen> {
   /// (טקסט, הגענו?, כיוון החץ)
   (String, bool, double?) _nav(AppLocalizations t) {
     final tgt = _target;
-    if (tgt == null) return (d.plot == null ? t.noGraveLoc : t.plotNotMapped(d.plot!), false, null);
+    if (tgt == null) return (d.plot == null ? t.noGraveLoc : t.plotNotMapped(_gp(d, t)), false, null);
     if (_locDenied) return (t.locDenied, false, null);
     if (_me == null) return (t.locating, false, null);
     final m = meters(_me!, tgt), br = bearing(_me!, tgt);
@@ -149,10 +149,10 @@ class _DetailScreenState extends State<DetailScreen> {
     if (_grave != null && m <= 5) return (t.arrivedGrave, true, null);
     if (_grave == null && _est != null && m <= 8) return (t.arrivedEst + look, true, null);
     if (_grave == null && _est == null && _targetRing != null && inPolygon(_me!, _targetRing!)) {
-      return (t.arrivedPlot(d.plot!) + look, true, null);
+      return (t.arrivedPlot(_gp(d, t)) + look, true, null);
     }
     if (m > 2000) return (t.farAway((m / 1000).toStringAsFixed(1)), false, br);
-    final dest = _grave != null ? t.theGrave : (_est != null ? t.theGraveEst : t.plotN(d.plot!));
+    final dest = _grave != null ? t.theGrave : (_est != null ? t.theGraveEst : t.plotN(_gp(d, t)));
     return (t.metersTo(m.round(), _dir(t, br), dest) + (_heading == null ? t.northNote : ''), false, br);
   }
 
@@ -443,7 +443,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         Text('${n.$1.icon} ${fmt('${roundMeters(n.$2)}')}', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
                   const SizedBox(height: 10),
                   Row(children: [
-                    for (final (label, val) in [(t.plot, d.plot), (t.row, d.row), (t.grave, d.grave)])
+                    for (final (label, val) in [(t.gush, d.gush), (t.plot, d.plot), (t.row, d.row), (t.grave, d.grave)])
                       Expanded(
                         child: Container(
                           margin: const EdgeInsetsDirectional.only(end: 6),
@@ -586,3 +586,6 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 }
+
+/// מספר החלקה, ואם ידוע גם הגוש ("5, גוש 2")
+String _gp(Deceased d, AppLocalizations t) => d.gush == null ? d.plot! : '${d.plot}, ${t.gush} ${d.gush}';

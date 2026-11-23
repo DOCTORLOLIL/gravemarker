@@ -347,7 +347,7 @@ class _RouteScreenState extends State<RouteScreen> {
                               ]),
                               title: Text(d.fullName, style: const TextStyle(fontWeight: FontWeight.bold)),
                               subtitle: Text([
-                                if (d.plot != null) '${t.plot} ${d.plot}',
+                                if (d.plot != null) '${d.gush != null ? '${t.gush} ${d.gush}, ' : ''}${t.plot} ${d.plot}',
                                 if (dist != null) t.routeFromPrev('$dist'),
                               ].join(' · ')),
                               trailing: Row(mainAxisSize: MainAxisSize.min, children: [

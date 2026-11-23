@@ -16,6 +16,7 @@
  "loadError": "Impossible de charger les données. Vérifiez votre connexion et réessayez.",
  "fatherName": "Père : {name}",
  "motherName": "Mère : {name}",
+ "gush": "Bloc",
  "plot": "Parcelle",
  "row": "Rangée",
  "grave": "Tombe",

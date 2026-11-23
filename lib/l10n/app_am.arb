@@ -16,6 +16,7 @@
  "loadError": "መረጃውን መጫን አልተቻለም። ግንኙነትዎን ያረጋግጡና እንደገና ይሞክሩ።",
  "fatherName": "አባት፦ {name}",
  "motherName": "እናት፦ {name}",
+ "gush": "ብሎክ",
  "plot": "ክፍል",
  "row": "ረድፍ",
  "grave": "መቃብር",

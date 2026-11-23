@@ -16,6 +16,7 @@
  "loadError": "Could not load data. Check your connection and try again.",
  "fatherName": "Father: {name}",
  "motherName": "Mother: {name}",
+ "gush": "Block",
  "plot": "Plot",
  "row": "Row",
  "grave": "Grave",
